@@ -484,16 +484,6 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             public DateTime timeElapsed;
         }
 
-        
-        ////////double[] pose1 = new double[15];
-        ////////enum angles
-        ////////{
-        ////////    rightWristAngle = 0, rightElbowAngle, rightShoulderAngle, leftWristAngle, leftElbowAngle, leftShoulderAngle, rightAnkleAngle,
-        ////////    rightKneeAngle, rightHipAngle, leftAnkleAngle, leftKneeAngle, leftHipAngle, spineAngle, neckAngle, centerShoulderAngle
-        ////////};
-
-
-
 
         /// <summary>
         /// Return the angle between 3 Joints
@@ -789,6 +779,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             return isCurrentPose;
         }
 
+
         /// <summary>
         /// Checks the validity if the current joint angle is within +- 15deg. of the matching captured joint angle
         /// </summary>
@@ -813,7 +804,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             skeletonPose pose = new skeletonPose();
 
             /* Right arm joint angles */
-            double RWA = AngleBetweenJoints(skel.Joints[JointType.ElbowRight],
+            double RWA = AngleBetweenJoints(skel.Joints[JointType.ElbowRight],                                                      /* EDITED TO NEW VERSION */
                 skel.Joints[JointType.WristRight], skel.Joints[JointType.HandRight]);
             pose.Joints[(int)JointLabels.rightWristAngle] = RWA;  /* Determines the right wrist angle */
 
