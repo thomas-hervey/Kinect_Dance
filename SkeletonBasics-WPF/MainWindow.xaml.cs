@@ -30,6 +30,10 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         private skeletonPose[] poseAray = new skeletonPose[6];
         private int numPosesCaptured = 0;
 
+        //Creates a path to the text file with the names of the joints that we want to check for each captured pose
+        String jointsToCheckPath = "C:\\Users\\KinectDance\\Documents\\SkeletonBasics-WPF\\poses\\JointsToCheck";
+
+
 
 
         /***************************************************************************************************************************************************/
@@ -444,6 +448,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                     this.sensor.SkeletonStream.TrackingMode = SkeletonTrackingMode.Default;
                 }
             }
+            Dictionary<string,int> jointFromName = new Dictionary<string,int>();
         }
 
 
@@ -469,19 +474,50 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             /// <summary>                                                                                                                                                
             /// map normal names to joint array indices
             /// </summary>
-            enum JointLabels
+            public enum JointLabels
             {
                 rightWristAngle, rightElbowAngle, rightShoulderAngle, leftWristAngle, leftElbowAngle, leftShoulderAngle, rightAnkleAngle,
                 rightKneeAngle, rightHipAngle, leftAnkleAngle, leftKneeAngle, leftHipAngle, spineAngle, neckAngle, centerShoulderAngle,
                 numJoints
             };
 
-            public double[] Joints = new double[(int)JointLabels.numJoints];
+            //Joints array that holds a pose's angles
+            public double[] Joints = new double[(int)JointLabels.numJoints];            
 
+            //Joint name & index dictionary to store in each pose
             public Dictionary<string,int> jointFromName = new Dictionary<string,int>();
-            jointFromName.Add("rightWristAngle", (int)JointLabels.rightWristAngle);      /* doesn't like being declared like this, expects to see this in code. Need to have this in an initializer/constructor; could be an issue at line 688 */
-
+            
+            //Time variable started when pose is captured in getPose()
             public DateTime timeElapsed;
+        }
+
+
+        /// <summary>
+        /// fills a new pose's dictionary with joint names and indicies. This is called from getPose()
+        /// </summary>
+        /// <returns>filledPose: pose with filled dictionary</returns>
+        public skeletonPose fillJointNames()
+        {
+            skeletonPose filledPose = new skeletonPose();
+
+            filledPose.jointFromName.Add("rightWristAngle", Convert.ToInt32(skeletonPose.JointLabels.rightWristAngle));
+            filledPose.jointFromName.Add("rightElbowAngle", Convert.ToInt32(skeletonPose.JointLabels.rightElbowAngle));
+            filledPose.jointFromName.Add("rightShoulderAngle", Convert.ToInt32(skeletonPose.JointLabels.rightShoulderAngle));
+            filledPose.jointFromName.Add("leftWristAngle", Convert.ToInt32(skeletonPose.JointLabels.leftWristAngle));
+            filledPose.jointFromName.Add("leftElbowAngle", Convert.ToInt32(skeletonPose.JointLabels.leftElbowAngle));
+            filledPose.jointFromName.Add("leftShoulderAngle", Convert.ToInt32(skeletonPose.JointLabels.leftShoulderAngle));
+            filledPose.jointFromName.Add("rightAnkleAngle", Convert.ToInt32(skeletonPose.JointLabels.rightAnkleAngle));
+            filledPose.jointFromName.Add("rightKneeAngle", Convert.ToInt32(skeletonPose.JointLabels.rightKneeAngle));
+            filledPose.jointFromName.Add("rightHipAngle", Convert.ToInt32(skeletonPose.JointLabels.rightHipAngle));
+            filledPose.jointFromName.Add("leftAnkleAngle", Convert.ToInt32(skeletonPose.JointLabels.leftAnkleAngle));
+            filledPose.jointFromName.Add("leftKneeAngle", Convert.ToInt32(skeletonPose.JointLabels.leftKneeAngle));
+            filledPose.jointFromName.Add("leftHipAngle", Convert.ToInt32(skeletonPose.JointLabels.leftHipAngle));
+            filledPose.jointFromName.Add("spineAngle", Convert.ToInt32(skeletonPose.JointLabels.spineAngle));
+            filledPose.jointFromName.Add("neckAngle", Convert.ToInt32(skeletonPose.JointLabels.neckAngle));
+            filledPose.jointFromName.Add("centerShoulderAngle", Convert.ToInt32(skeletonPose.JointLabels.centerShoulderAngle));
+            filledPose.jointFromName.Add("numJoints", Convert.ToInt32(skeletonPose.JointLabels.numJoints));
+
+            return filledPose;
         }
 
 
@@ -491,7 +527,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         /// <param name="j1"></param>
         /// <param name="j2"></param>
         /// <param name="j3"></param>
-        /// <returns>angle</returns>
+        /// <returns>angle: the angle of the middle joint j2</returns>
         public static double AngleBetweenJoints(Joint j1, Joint j2, Joint j3)
         {
             double angle = 0;
@@ -536,7 +572,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         /// Get distance between two joints
         /// </summary>
         /// <param name="joint1"></param>
-        /// <param name="join2"></param>
+        /// <param name="joint2"></param>
         /// <returns>joint distance in [*missing unit*]</returns>
         private double getDistanceJoints(Joint joint1, Joint joint2)
         {
@@ -555,7 +591,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 
 
         /// <summary>
-        /// Event when a button is clicked to capture a pose
+        /// Event when a button is clicked to capture a pose. This will be used to capture poses before a performance.
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -579,25 +615,26 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 
 
 
-        /// <summary>
-        /// Checks to see if the current pose from the stream is in the field goal pose (both elbow joints are at a 90degree angle)
-        /// </summary>
-        /// <param name="capturedPose"></param>
-        /// <param name="currentSkel"></param>
-        /// <returns>field goal pose validity</returns>
-        private Boolean isCurrentFGPose(skeletonPose capturedPose, Skeleton currentSkel)
-        {
-            Boolean isCurrentPose = false;
-            skeletonPose currentPose = getPose(currentSkel);
+        ///// <summary>
+        ///// Checks to see if the current pose from the stream is in the field goal pose (both elbow joints are at a 90degree angle)
+        ///// </summary>
+        ///// <param name="capturedPose"></param>
+        ///// <param name="currentSkel"></param>
+        ///// <returns>field goal pose validity</returns>
+        //private Boolean isCurrentFGPose(skeletonPose capturedPose, Skeleton currentSkel)
+        //{
+        //    Boolean isCurrentPose = false;
+        //    skeletonPose currentPose = getPose(currentSkel);
 
-            if (((currentPose.rightElbowAngle >= (capturedPose.rightElbowAngle - 10)) && (currentPose.rightElbowAngle <= (capturedPose.rightElbowAngle + 10))
-               && (currentPose.leftElbowAngle >= (capturedPose.leftElbowAngle - 10)) && (currentPose.leftElbowAngle <= (capturedPose.leftElbowAngle + 10))))
-            {
-                isCurrentPose = true;
-            }
+        //    if (((currentPose.rightElbowAngle >= (capturedPose.rightElbowAngle - 10)) && (currentPose.rightElbowAngle <= (capturedPose.rightElbowAngle + 10))
+        //       && (currentPose.leftElbowAngle >= (capturedPose.leftElbowAngle - 10)) && (currentPose.leftElbowAngle <= (capturedPose.leftElbowAngle + 10))))
+        //    {
+        //        isCurrentPose = true;
+        //    }
 
-            return isCurrentPose;
-        }
+        //    return isCurrentPose;
+        //}
+        
 
 
         /// <summary>
@@ -637,7 +674,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 
             txtCapturedInfo.Text = "Pose captured!";
 
-            // CHECK TO SEE IF isCurrentPose WOULD RETURN TRUE 
+            // Check to see if isCurrentPose returns true
             CAPTURED_POSE = capturedPose1;
 
 
@@ -659,41 +696,46 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 
 
         /// <summary>
-        /// Checks to see if the captured pose is the same (within 20degrees) of the current pose from the stream *CURRENTLY ONLY COMPARES THE WRIST, ELBOW, AND SHOULDER ANGLES*
+        /// Checks to see if the desired checkable angles in the captured pose is the same (within 20degrees) of the current pose from the stream
         /// </summary>
         /// <param name="capturedPose"></param>
         /// <param name="currentSkel"></param>
-        /// <returns>validity of comparison between the poses</returns>
-        private Boolean isCurrentPose(skeletonPose capturedPose, Skeleton currentSkel)
+        /// /// <param name="jointsToCheckPath"></param>
+        /// <returns>isCurrentPose: validity of comparison between the poses</returns>
+        private Boolean isCurrentPose(skeletonPose capturedPose, Skeleton currentSkel, String jointsToCheckPath)
         {
             skeletonPose currentPose = getPose(currentSkel);
+            
             Boolean isCurrentPose = true;
 
-            String jointsToCheckPath = "C:\\Users\\KinectDance\\Documents\\SkeletonBasics-WPF\\poses\\JointsToCheck"; /* SELF-NOTE we could do this once when we start rather than every read */
             String[] jointsToCheck = System.IO.File.ReadAllLines(jointsToCheckPath);
 
-            /* option 1 */                                            /* figure out how to initialize the jointFromName dictionary in a way that C#  */
+            /* option 2 */
+            for (int j = 0; j < (int)skeletonPose.JointLabels.numJoints; ++j)
+            {
+                if (jointInList(jointsToCheck, currentPose) && !withinRange(currentPose.Joints[j], capturedPose.Joints[j]))
+                {
+                    isCurrentPose = false;
+                    break;
+                }
+            }
+
+            return isCurrentPose;
+
+
+            /* option 1                                           /* figure out how to initialize the jointFromName dictionary in a way that C#  
             for (int i = 0; i < jointsToCheck.Length; ++i)
             {
-                int j = currentPose.jointFromName[jointsToCheck[i]]; /* joint integer from string name */
+                int j = currentPose.jointFromName[jointsToCheck[i]]; /* joint integer from string name 
                 if (!withinRange(currentPose.Joints[j], capturedPose.Joints[j]))
                 {
                     isCurrentPose = false;
                     break;
                 }
             }
+             * */
 
-            /* option 2 */
-            for (int j = 0; j < JointLabels.numJoints; ++j)
-            {
-                if (jointInList(jointsToCheck, j) && !withinRange(currentPose.Joints[j], caputuredPose.Joints[j]))
-                {
-                    isCurrentPose = false;
-                    break;
-                }
-            }
-
-            /* old */
+            /* old 
             int i = jointsToCheck.Length;
             while(isCurrentPose && i > 0)
             {
@@ -775,8 +817,29 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 
                 i--;
             }
-                 
-            return isCurrentPose;
+             * 
+             */
+        }
+
+
+        /// <summary>
+        /// Checks to see if the current joint name from the external joints to check text file is in our array of joints
+        /// </summary>
+        /// <param name="jointsToCheck"></param>
+        /// <param name="currentPose"></param>
+        /// <returns>isInList: boolean value if the name is in the joints array</returns>
+        private Boolean jointInList(String[] jointsToCheck, skeletonPose currentPose)
+        {
+            Boolean isInList = false;
+            
+            for (int i = 0; i < jointsToCheck.Length; i++) 
+            {
+                if (currentPose.jointFromName.ContainsKey(jointsToCheck[i]))
+                {
+                    isInList = true;
+                }
+            }
+            return isInList;
         }
 
 
@@ -787,7 +850,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         /// <param name="captured"></param>
         /// <returns>boolean value if the angle is within range</returns>
         private Boolean withinRange(double current, double captured) {
-            if ((current >= captured - 15) && (current <= captured + 15)) 
+            if ((current >= captured - 20) && (current <= captured + 20)) 
             {return true;}
             else
             {return false;}
@@ -801,75 +864,78 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         /// <returns>skeletonPose pose: the pose struct with the updated joint angles & time stamp</returns>
         private skeletonPose getPose(Skeleton skel)
         {
+            //Creates a new blank pose
             skeletonPose pose = new skeletonPose();
+            //Fills the pose with the enum joint names
+            pose = fillJointNames();
 
             /* Right arm joint angles */
-            double RWA = AngleBetweenJoints(skel.Joints[JointType.ElbowRight],                                                      /* EDITED TO NEW VERSION */
+            double RWA = AngleBetweenJoints(skel.Joints[JointType.ElbowRight],                                                   
                 skel.Joints[JointType.WristRight], skel.Joints[JointType.HandRight]);
-            pose.Joints[(int)JointLabels.rightWristAngle] = RWA;  /* Determines the right wrist angle */
-
-
+            pose.Joints[(int)skeletonPose.JointLabels.rightWristAngle] = RWA;  /* Determines the right wrist angle */
             double REA = AngleBetweenJoints(skel.Joints[JointType.ShoulderRight],
                 skel.Joints[JointType.ElbowRight], skel.Joints[JointType.WristRight]);
-            pose.rightElbowAngle = REA;  /* Determines the right elbow angle */
+            pose.Joints[(int)skeletonPose.JointLabels.rightElbowAngle] = REA;  /* Determines the right elbow angle */
             double RSA = AngleBetweenJoints(skel.Joints[JointType.ShoulderCenter],
                 skel.Joints[JointType.ShoulderRight], skel.Joints[JointType.ElbowRight]);
-            pose.rightShoulderAngle = RSA;  /* Determines the right shoulder angle */
+            pose.Joints[(int)skeletonPose.JointLabels.rightShoulderAngle] = RSA;  /* Determines the right shoulder angle */
 
 
             /* Left arm joint angles */
             double LWA = AngleBetweenJoints(skel.Joints[JointType.ElbowLeft],
                 skel.Joints[JointType.WristLeft], skel.Joints[JointType.HandLeft]);
-            pose.leftWristAngle = LWA;  /* Determines the left wrist angle */
+            pose.Joints[(int)skeletonPose.JointLabels.leftWristAngle] = LWA;  /* Determines the left wrist angle */
             double LEA = AngleBetweenJoints(skel.Joints[JointType.ShoulderLeft],
                 skel.Joints[JointType.ElbowLeft], skel.Joints[JointType.WristLeft]);
-            pose.leftElbowAngle = LEA;  /* Determines the left elbow angle */
+            pose.Joints[(int)skeletonPose.JointLabels.leftElbowAngle] = LEA;  /* Determines the left elbow angle */
             double LSA = AngleBetweenJoints(skel.Joints[JointType.ShoulderCenter],
                 skel.Joints[JointType.ShoulderLeft], skel.Joints[JointType.ElbowLeft]);
-            pose.leftShoulderAngle = LSA;  /* Determines the left shoulder angle */
+            pose.Joints[(int)skeletonPose.JointLabels.leftShoulderAngle] = LSA;  /* Determines the left shoulder angle */
 
 
             /* Right leg joint angles */
             double RAA = AngleBetweenJoints(skel.Joints[JointType.KneeRight],
                 skel.Joints[JointType.AnkleRight], skel.Joints[JointType.FootRight]);
-            pose.rightAnkleAngle = RAA;  /* Determines the right ankle angle */
+            pose.Joints[(int)skeletonPose.JointLabels.rightAnkleAngle] = RAA;  /* Determines the right ankle angle */
             double RKA = AngleBetweenJoints(skel.Joints[JointType.HipRight],
                 skel.Joints[JointType.KneeRight], skel.Joints[JointType.AnkleRight]);
-            pose.rightKneeAngle = RKA;  /* Determines the right knee angle */
+            pose.Joints[(int)skeletonPose.JointLabels.rightKneeAngle] = RKA;  /* Determines the right knee angle */
             double RHA = AngleBetweenJoints(skel.Joints[JointType.HipCenter],
                 skel.Joints[JointType.HipRight], skel.Joints[JointType.KneeRight]);
-            pose.rightHipAngle = RHA;  /* Determines the right hip angle */
+            pose.Joints[(int)skeletonPose.JointLabels.rightHipAngle] = RHA;  /* Determines the right hip angle */
 
 
             /* Left leg joint angles */
             double LAA = AngleBetweenJoints(skel.Joints[JointType.KneeLeft],
                 skel.Joints[JointType.AnkleLeft], skel.Joints[JointType.FootLeft]);
-            pose.leftAnkleAngle = RAA;  /* Determines the left ankle angle */
+            pose.Joints[(int)skeletonPose.JointLabels.leftAnkleAngle] = RAA;  /* Determines the left ankle angle */
             double LKA = AngleBetweenJoints(skel.Joints[JointType.HipLeft],
                 skel.Joints[JointType.KneeLeft], skel.Joints[JointType.AnkleLeft]);
-            pose.leftKneeAngle = LKA;  /* Determines the left knee angle */
+            pose.Joints[(int)skeletonPose.JointLabels.leftKneeAngle] = LKA;  /* Determines the left knee angle */
             double LHA = AngleBetweenJoints(skel.Joints[JointType.HipCenter],
                 skel.Joints[JointType.HipLeft], skel.Joints[JointType.KneeLeft]);
-            pose.leftHipAngle = LHA;  /* Determines the left hip angle */
+            pose.Joints[(int)skeletonPose.JointLabels.leftHipAngle] = LHA;  /* Determines the left hip angle */
 
 
             /* Torso joint angles */
             //We don't have a need for the HipCenter joint
             double SA = AngleBetweenJoints(skel.Joints[JointType.HipCenter],
                 skel.Joints[JointType.Spine], skel.Joints[JointType.ShoulderCenter]);
-            pose.spineAngle = SA;  /* Determines the spine angle */
+            pose.Joints[(int)skeletonPose.JointLabels.spineAngle] = SA;  /* Determines the spine angle */
             double NA = AngleBetweenJoints(skel.Joints[JointType.Spine],
                 skel.Joints[JointType.ShoulderCenter], skel.Joints[JointType.Head]);
-            pose.neckAngle = NA;  /* Determines the neck angle *NOTE: This is the angle of the 3 vertical points for ShoulderCenter* */
+            pose.Joints[(int)skeletonPose.JointLabels.neckAngle] = NA;  /* Determines the neck angle *NOTE: This is the angle of the 3 vertical points for ShoulderCenter* */
             double CSA = AngleBetweenJoints(skel.Joints[JointType.ShoulderLeft],
                 skel.Joints[JointType.ShoulderCenter], skel.Joints[JointType.ShoulderRight]);
-            pose.centerShoulderAngle = CSA;  /* Determines the neck angle *NOTE: This is the angle of the 3 horizontal points for ShoulderCenter* */
+            pose.Joints[(int)skeletonPose.JointLabels.centerShoulderAngle] = CSA;  /* Determines the neck angle *NOTE: This is the angle of the 3 horizontal points for ShoulderCenter* */
 
             /* Gets the current time of the capture; reference for next pose capture delay */
             pose.timeElapsed = DateTime.Now;
 
+            /* Return the new pose with filled joint names, indicies, angles */
             return pose;
         }
+
 
         /// <summary>
         /// Puts the skeleton joint angles in an array to be saved to a text file
@@ -882,21 +948,21 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 
             String POSES_FOLDER_PATH = "C:\\Users\\KinectDance\\Documents\\SkeletonBasics-WPF\\poses\\Pose_";
 
-            angles[0] = p.Joints[JointType.WristRight];
-            angles[1] = p.rightElbowAngle;
-            angles[2] = p.rightShoulderAngle;
-            angles[3] = p.leftWristAngle;
-            angles[4] = p.leftElbowAngle;
-            angles[5] = p.leftShoulderAngle;
-            angles[6] = p.rightAnkleAngle;
-            angles[7] = p.rightKneeAngle;
-            angles[8] = p.rightHipAngle;
-            angles[9] = p.leftAnkleAngle;
-            angles[10] = p.leftKneeAngle;
-            angles[11] = p.leftHipAngle;
-            angles[12] = p.spineAngle;
-            angles[13] = p.neckAngle;
-            angles[14] = p.centerShoulderAngle;
+            angles[0] = p.Joints[0];
+            angles[1] = p.Joints[1];
+            angles[2] = p.Joints[2];
+            angles[3] = p.Joints[3];
+            angles[4] = p.Joints[4];
+            angles[5] = p.Joints[5];
+            angles[6] = p.Joints[6];
+            angles[7] = p.Joints[7];
+            angles[8] = p.Joints[8];
+            angles[9] = p.Joints[9];
+            angles[10] = p.Joints[10];
+            angles[11] = p.Joints[11];
+            angles[12] = p.Joints[12];
+            angles[13] = p.Joints[13];
+            angles[14] = p.Joints[14];
             
             String[] strAngles = new String[15];
 
