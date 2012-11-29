@@ -482,10 +482,10 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             };
 
             //Joints array that holds a pose's angles
-            public double[] Joints = new double[(int)JointLabels.numJoints];            
+            public double[] Joints;            
 
             //Joint name & index dictionary to store in each pose
-            public Dictionary<string,int> jointFromName = new Dictionary<string,int>();
+            public Dictionary<string, int> jointFromName;
             
             //Time variable started when pose is captured in getPose()
             public DateTime timeElapsed;
@@ -496,7 +496,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         /// fills a new pose's dictionary with joint names and indicies. This is called from getPose()
         /// </summary>
         /// <returns>filledPose: pose with filled dictionary</returns>
-        public skeletonPose fillJointNames()
+        private skeletonPose fillJointNames()
         {
             skeletonPose filledPose = new skeletonPose();
 
@@ -615,25 +615,21 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 
 
 
-        ///// <summary>
-        ///// Checks to see if the current pose from the stream is in the field goal pose (both elbow joints are at a 90degree angle)
-        ///// </summary>
-        ///// <param name="capturedPose"></param>
-        ///// <param name="currentSkel"></param>
-        ///// <returns>field goal pose validity</returns>
-        //private Boolean isCurrentFGPose(skeletonPose capturedPose, Skeleton currentSkel)
-        //{
-        //    Boolean isCurrentPose = false;
-        //    skeletonPose currentPose = getPose(currentSkel);
+        /// <summary>
+        /// Checks to see if the current pose from the stream is in the field goal pose (both elbow joints are at a 90degree angle)
+        /// </summary>
+        /// <param name="capturedPose"></param>
+        /// <param name="currentSkel"></param>
+        /// <returns>field goal pose validity</returns>
+        private Boolean isCurrentFGPose(skeletonPose capturedPose, Skeleton currentSkel)
+        {
+            Boolean isCurrentPose = false;
+            skeletonPose currentPose = getPose(currentSkel);
 
-        //    if (((currentPose.rightElbowAngle >= (capturedPose.rightElbowAngle - 10)) && (currentPose.rightElbowAngle <= (capturedPose.rightElbowAngle + 10))
-        //       && (currentPose.leftElbowAngle >= (capturedPose.leftElbowAngle - 10)) && (currentPose.leftElbowAngle <= (capturedPose.leftElbowAngle + 10))))
-        //    {
-        //        isCurrentPose = true;
-        //    }
+     
 
-        //    return isCurrentPose;
-        //}
+            return isCurrentPose;
+        }
         
 
 
@@ -849,8 +845,9 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         /// <param name="current"></param>
         /// <param name="captured"></param>
         /// <returns>boolean value if the angle is within range</returns>
-        private Boolean withinRange(double current, double captured) {
-            if ((current >= captured - 20) && (current <= captured + 20)) 
+        private Boolean withinRange(double currentAngle, double capturedAngle) 
+        {
+            if ((currentAngle >= capturedAngle - 20) && (currentAngle <= capturedAngle + 20)) 
             {return true;}
             else
             {return false;}
@@ -858,7 +855,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 
 
         /// <summary>
-        /// Gets the joint angles of the current skeleton from the stream and saves them into a pose
+        /// Creates a new pose from the skeleton stream and fills it with joint names, captured angles, and a time stamp
         /// </summary>
         /// <param name="skel"></param>
         /// <returns>skeletonPose pose: the pose struct with the updated joint angles & time stamp</returns>
@@ -866,8 +863,16 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         {
             //Creates a new blank pose
             skeletonPose pose = new skeletonPose();
+
+            //Initilize the Joints array
+            pose.Joints = new double[(int)skeletonPose.JointLabels.numJoints];
+
+            //Initilize the jointFromName dictionary
+            pose.jointFromName = new Dictionary<string, int>();
+
             //Fills the pose with the enum joint names
             pose = fillJointNames();
+
 
             /* Right arm joint angles */
             double RWA = AngleBetweenJoints(skel.Joints[JointType.ElbowRight],                                                   
@@ -946,36 +951,28 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         {
             double[] angles = new double[15];
 
+            //Path to pose text files folder
             String POSES_FOLDER_PATH = "C:\\Users\\KinectDance\\Documents\\SkeletonBasics-WPF\\poses\\Pose_";
 
-            angles[0] = p.Joints[0];
-            angles[1] = p.Joints[1];
-            angles[2] = p.Joints[2];
-            angles[3] = p.Joints[3];
-            angles[4] = p.Joints[4];
-            angles[5] = p.Joints[5];
-            angles[6] = p.Joints[6];
-            angles[7] = p.Joints[7];
-            angles[8] = p.Joints[8];
-            angles[9] = p.Joints[9];
-            angles[10] = p.Joints[10];
-            angles[11] = p.Joints[11];
-            angles[12] = p.Joints[12];
-            angles[13] = p.Joints[13];
-            angles[14] = p.Joints[14];
-            
-            String[] strAngles = new String[15];
+            angles[0] = p.Joints[0]; angles[1] = p.Joints[1]; angles[2] = p.Joints[2]; angles[3] = p.Joints[3];
+            angles[4] = p.Joints[4]; angles[5] = p.Joints[5]; angles[6] = p.Joints[6]; angles[7] = p.Joints[7];
+            angles[8] = p.Joints[8]; angles[9] = p.Joints[9]; angles[10] = p.Joints[10]; angles[11] = p.Joints[11];
+            angles[12] = p.Joints[12]; angles[13] = p.Joints[13]; angles[14] = p.Joints[14];
 
+            //Creating a new path/name for each new pose
             String poseFolderPath = POSES_FOLDER_PATH + numPosesCaptured + ".txt";
 
+            String[] strAngles = new String[15];
+
+            //Converting the angles to strings for writting to the external txt file
             for (int i = 0; i < angles.Length; i++)
             {
                 strAngles[i] = Convert.ToString(angles[i]) + "\n";
             }
 
             System.IO.File.WriteAllLines(poseFolderPath, strAngles);
-        }
-                                                                                             
+        }                                                                           
         /*****************************************************************************************************************************************/
+
     }
 }
