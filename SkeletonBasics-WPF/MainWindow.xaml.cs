@@ -475,7 +475,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         struct skeletonPose
         {
             /// <summary>                                                                                                                                                
-            /// map normal names to joint array indices
+            /// Map normal names to joint array indices
             /// </summary>
             public enum JointLabels
             {
@@ -484,13 +484,13 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                 numJoints
             };
 
-            //Joints array that holds a pose's angles
+            // Joints array that holds a pose's angles
             public double[] Joints;            
 
-            //Joint name & index dictionary to store in each pose
+            // Joint name & index dictionary to store in each pose
             public Dictionary<string, int> jointFromName;
             
-            //Time variable started when pose is captured in getPose()
+            // Time variable started when pose is captured in getPose()
             public DateTime timeElapsed;
         }
 
@@ -568,84 +568,84 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         /// <returns>skeletonPose pose: the pose struct with the updated joint angles & time stamp</returns>
         private skeletonPose getPose(Skeleton skel)
         {
-            //Creates a new blank pose
+            // Creates a new blank pose
             skeletonPose pose = new skeletonPose();
 
-            //Fills the pose with the enum joint names & initilizes Joints
+            // Fills the pose with the enum joint names & initilizes Joints
             pose = fillJointNames();
 
 
             /* Right arm joint angles */
             double RWA = AngleBetweenJoints(skel.Joints[JointType.ElbowRight],
                 skel.Joints[JointType.WristRight], skel.Joints[JointType.HandRight]);
-            pose.Joints[(int)skeletonPose.JointLabels.rightWristAngle] = RWA;  /* Determines the right wrist angle */
+            pose.Joints[(int)skeletonPose.JointLabels.rightWristAngle] = RWA;  // Determines the right wrist angle
             double REA = AngleBetweenJoints(skel.Joints[JointType.ShoulderRight],
                 skel.Joints[JointType.ElbowRight], skel.Joints[JointType.WristRight]);
-            pose.Joints[(int)skeletonPose.JointLabels.rightElbowAngle] = REA;  /* Determines the right elbow angle */
+            pose.Joints[(int)skeletonPose.JointLabels.rightElbowAngle] = REA;  // Determines the right elbow angle
             double RSA = AngleBetweenJoints(skel.Joints[JointType.ShoulderCenter],
                 skel.Joints[JointType.ShoulderRight], skel.Joints[JointType.ElbowRight]);
-            pose.Joints[(int)skeletonPose.JointLabels.rightShoulderAngle] = RSA;  /* Determines the right shoulder angle */
+            pose.Joints[(int)skeletonPose.JointLabels.rightShoulderAngle] = RSA;  // Determines the right shoulder angle
 
 
             /* Left arm joint angles */
             double LWA = AngleBetweenJoints(skel.Joints[JointType.ElbowLeft],
                 skel.Joints[JointType.WristLeft], skel.Joints[JointType.HandLeft]);
-            pose.Joints[(int)skeletonPose.JointLabels.leftWristAngle] = LWA;  /* Determines the left wrist angle */
+            pose.Joints[(int)skeletonPose.JointLabels.leftWristAngle] = LWA;  // Determines the left wrist angle
             double LEA = AngleBetweenJoints(skel.Joints[JointType.ShoulderLeft],
                 skel.Joints[JointType.ElbowLeft], skel.Joints[JointType.WristLeft]);
-            pose.Joints[(int)skeletonPose.JointLabels.leftElbowAngle] = LEA;  /* Determines the left elbow angle */
+            pose.Joints[(int)skeletonPose.JointLabels.leftElbowAngle] = LEA;  // Determines the left elbow angle
             double LSA = AngleBetweenJoints(skel.Joints[JointType.ShoulderCenter],
                 skel.Joints[JointType.ShoulderLeft], skel.Joints[JointType.ElbowLeft]);
-            pose.Joints[(int)skeletonPose.JointLabels.leftShoulderAngle] = LSA;  /* Determines the left shoulder angle */
+            pose.Joints[(int)skeletonPose.JointLabels.leftShoulderAngle] = LSA;  // Determines the left shoulder angle
 
 
             /* Right leg joint angles */
             double RAA = AngleBetweenJoints(skel.Joints[JointType.KneeRight],
                 skel.Joints[JointType.AnkleRight], skel.Joints[JointType.FootRight]);
-            pose.Joints[(int)skeletonPose.JointLabels.rightAnkleAngle] = RAA;  /* Determines the right ankle angle */
+            pose.Joints[(int)skeletonPose.JointLabels.rightAnkleAngle] = RAA;  // Determines the right ankle angle
             double RKA = AngleBetweenJoints(skel.Joints[JointType.HipRight],
                 skel.Joints[JointType.KneeRight], skel.Joints[JointType.AnkleRight]);
-            pose.Joints[(int)skeletonPose.JointLabels.rightKneeAngle] = RKA;  /* Determines the right knee angle */
+            pose.Joints[(int)skeletonPose.JointLabels.rightKneeAngle] = RKA;  // Determines the right knee angle
             double RHA = AngleBetweenJoints(skel.Joints[JointType.HipCenter],
                 skel.Joints[JointType.HipRight], skel.Joints[JointType.KneeRight]);
-            pose.Joints[(int)skeletonPose.JointLabels.rightHipAngle] = RHA;  /* Determines the right hip angle */
+            pose.Joints[(int)skeletonPose.JointLabels.rightHipAngle] = RHA;  // Determines the right hip angle
 
 
             /* Left leg joint angles */
             double LAA = AngleBetweenJoints(skel.Joints[JointType.KneeLeft],
                 skel.Joints[JointType.AnkleLeft], skel.Joints[JointType.FootLeft]);
-            pose.Joints[(int)skeletonPose.JointLabels.leftAnkleAngle] = RAA;  /* Determines the left ankle angle */
+            pose.Joints[(int)skeletonPose.JointLabels.leftAnkleAngle] = RAA;  // Determines the left ankle angle
             double LKA = AngleBetweenJoints(skel.Joints[JointType.HipLeft],
                 skel.Joints[JointType.KneeLeft], skel.Joints[JointType.AnkleLeft]);
-            pose.Joints[(int)skeletonPose.JointLabels.leftKneeAngle] = LKA;  /* Determines the left knee angle */
+            pose.Joints[(int)skeletonPose.JointLabels.leftKneeAngle] = LKA;  // Determines the left knee angle
             double LHA = AngleBetweenJoints(skel.Joints[JointType.HipCenter],
                 skel.Joints[JointType.HipLeft], skel.Joints[JointType.KneeLeft]);
-            pose.Joints[(int)skeletonPose.JointLabels.leftHipAngle] = LHA;  /* Determines the left hip angle */
+            pose.Joints[(int)skeletonPose.JointLabels.leftHipAngle] = LHA;  // Determines the left hip angle
 
 
             /* Torso joint angles */
-            //We don't have a need for the HipCenter joint
+            // We don't have a need for the HipCenter joint, it would a duplicate
             double SA = AngleBetweenJoints(skel.Joints[JointType.HipCenter],
                 skel.Joints[JointType.Spine], skel.Joints[JointType.ShoulderCenter]);
-            pose.Joints[(int)skeletonPose.JointLabels.spineAngle] = SA;  /* Determines the spine angle */
+            pose.Joints[(int)skeletonPose.JointLabels.spineAngle] = SA;  // Determines the spine angle
             double NA = AngleBetweenJoints(skel.Joints[JointType.Spine],
                 skel.Joints[JointType.ShoulderCenter], skel.Joints[JointType.Head]);
-            pose.Joints[(int)skeletonPose.JointLabels.neckAngle] = NA;  /* Determines the neck angle *NOTE: This is the angle of the 3 vertical points for ShoulderCenter* */
+            pose.Joints[(int)skeletonPose.JointLabels.neckAngle] = NA;  // Determines the neck angle *NOTE: This is the angle of the 3 vertical points for ShoulderCenter*
             double CSA = AngleBetweenJoints(skel.Joints[JointType.ShoulderLeft],
                 skel.Joints[JointType.ShoulderCenter], skel.Joints[JointType.ShoulderRight]);
-            pose.Joints[(int)skeletonPose.JointLabels.centerShoulderAngle] = CSA;  /* Determines the neck angle *NOTE: This is the angle of the 3 horizontal points for ShoulderCenter* */
+            pose.Joints[(int)skeletonPose.JointLabels.centerShoulderAngle] = CSA;  // Determines the neck angle *NOTE: This is the angle of the 3 horizontal points for ShoulderCenter*
 
 
-            /* Gets the current time of the capture; reference for next pose capture delay */
+            // Gets the current time of the capture; reference for next pose capture delay
             pose.timeElapsed = DateTime.Now;
 
-            /* Return the new pose with filled joint names, indicies, angles */
+            // Return the new pose with filled joint names, indicies, angles
             return pose;
         }
 
 
         /// <summary>
-        /// fills a new pose's dictionary with joint names and indicies. This is called from getPose()
+        /// Fills a new pose's dictionary with joint names and indicies. This is called from getPose()
         /// </summary>
         /// <returns>filledPose: pose with filled dictionary</returns>
         private skeletonPose fillJointNames()
@@ -693,9 +693,10 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 
             Boolean isCurrentPose = true;
 
+            // Reads in the joints to check for the pose to check
             String[] jointsToCheck = System.IO.File.ReadAllLines(JOINTS_TO_CHECK_PATH + "pose_" + jointsToCheckPoseNumber + ".txt");
 
-            /* option 2 */
+            // For all of the joints to check, see if any aren't the same, if so break
             for (int j = 0; j < (int)skeletonPose.JointLabels.numJoints; ++j)
             {
                 if (jointInList(jointsToCheck, currentPose) && !withinRange(currentPose.Joints[j], capturedPose.Joints[j]))
@@ -708,7 +709,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             return isCurrentPose;
 
 
-            /* option 1                                           /* figure out how to initialize the jointFromName dictionary in a way that C#  
+            /* option 1 /* figure out how to initialize the jointFromName dictionary in a way that C#  
             for (int i = 0; i < jointsToCheck.Length; ++i)
             {
                 int j = currentPose.jointFromName[jointsToCheck[i]]; /* joint integer from string name 
@@ -723,7 +724,8 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 
 
         /// <summary>
-        /// isCurrentPose helper method: Checks to see if the current joint name from the external joints to check text file is in our array of joints
+        /// isCurrentPose helper method: 
+        /// Checks to see if the current joint name from the external joints to check text file is in our array of joints
         /// </summary>
         /// <param name="jointsToCheck"></param>
         /// <param name="currentPose"></param>
@@ -744,7 +746,8 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 
 
         /// <summary>
-        /// isCurrentPose helper method: Checks the validity if the current joint angle is within +- 15deg. of the matching captured joint angle
+        /// isCurrentPose helper method: 
+        /// Checks the validity if the current joint angle is within +- 15deg. of the matching captured joint angle
         /// </summary>
         /// <param name="current"></param>
         /// <param name="captured"></param>
@@ -772,8 +775,6 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         {
             Boolean isCurrentPose = false;
             skeletonPose currentPose = getPose(currentSkel);
-
-     
 
             return isCurrentPose;
         }
@@ -817,6 +818,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 
 
         /// <summary>
+        /// AngleBetweenJoints helper method:
         /// Euclidean norm of 3-component Vector
         /// </summary>
         /// <param name="x"></param>
