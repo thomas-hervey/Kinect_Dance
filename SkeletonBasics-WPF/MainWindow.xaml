@@ -58,7 +58,7 @@
             <TextBlock DockPanel.Dock="Right" Margin="0 0 -1 0" VerticalAlignment="Bottom" Foreground="{StaticResource MediumGreyBrush}" FontFamily="Segoe UI" FontSize="18">Skeleton Basics</TextBlock>
             <Image Grid.Column="1" Source="Images\Status.png" Stretch="None" HorizontalAlignment="Center" Margin="0 0 0 5"/>
         </DockPanel>
-        <TextBlock Name= "txtNumbers" Background="Cyan" Width="500" Height="80" FontSize="10">
+        <TextBlock Name= "txtNumbers" Background="Cyan" Width="500" Height="80" FontSize="10" RenderTransformOrigin="0.497,0.459">
             <Button Name="btnCapture" Height="20" Width="50" Content="Capture" Visibility="Visible" Click="btnCapture_Click" />
             <TextBlock Name="txtCapturedInfo" Background="BurlyWood" Width= "200" Height="75"/>
         </TextBlock>

@@ -304,7 +304,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                                 else
                                 {
                                     txtCapturedInfo.Text = "Same pose (before 10) " + capturedTimeElapsed.Seconds.ToString();
-                                }                                                                                                                                   
+                                }                                                                                                          
                             }                                                                                                                               
                         }  
                                                                                                                                  
@@ -542,11 +542,12 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 
             // Set the captured pose to a constant to be used elsewhere
             CAPTURED_POSE = capturedPose;
-
+            
 
             // Write the pose joint angles to a unique text file in .\\poses
             writePoseToFile(CAPTURED_POSE);
 
+            //TO BE REMOVED LATER
             if (numPosesCaptured <= 5)
             {
                 poseAray[numPosesCaptured] = CAPTURED_POSE;
@@ -880,6 +881,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         /// <returns>N/A</returns>
         private void writePoseToFile(skeletonPose p) 
         {
+            //Creating an array of joint angles
             double[] angles = new double[15];
 
             angles[0] = p.Joints[0]; angles[1] = p.Joints[1]; angles[2] = p.Joints[2]; angles[3] = p.Joints[3];
@@ -887,19 +889,40 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             angles[8] = p.Joints[8]; angles[9] = p.Joints[9]; angles[10] = p.Joints[10]; angles[11] = p.Joints[11];
             angles[12] = p.Joints[12]; angles[13] = p.Joints[13]; angles[14] = p.Joints[14];
 
-            //Creating a new path/name for each new pose
-            String poseFolderPath = POSES_FOLDER_PATH + numPosesCaptured + ".txt";
-
+            //Creating an array that will hold the converted toString angles
             String[] strAngles = new String[15];
+
+            //String that will hold the concatenated angles as a string in display in a pop-up
+            String promptAngles = "";
 
             //Converting the angles to strings for writting to the external txt file
             for (int i = 0; i < angles.Length; i++)
             {
                 strAngles[i] = Convert.ToString(angles[i]) + "\n";
+                promptAngles += i + ": " + Convert.ToString(angles[i]) + "\n";
             }
 
-            System.IO.File.WriteAllLines(poseFolderPath, strAngles);
-        }  
+            //Pop-up window prompt to ask if the captured pose should be saved or not
+            if (MessageBox.Show("Save this pose?\n\n" + promptAngles, "Save Pose", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+            {
+                //Creating a new path/name for each new pose
+                String poseFolderPath = POSES_FOLDER_PATH + numPosesCaptured + ".txt";
+                //Write out the string angles to the text file
+                System.IO.File.WriteAllLines(poseFolderPath, strAngles);
+            }
+
+
+
+            //Boolean pause = false;
+            //MessageBoxResult result = MessageBox.Show("Save this pose?\n\n" + promptAngles, "Save Pose", MessageBoxButton.YesNo);
+            //if (result == MessageBoxResult.Yes)
+            //{
+            //    //Creating a new path/name for each new pose
+            //    String poseFolderPath = POSES_FOLDER_PATH + numPosesCaptured + ".txt";
+            //    //Write out the string angles to the text file
+            //    System.IO.File.WriteAllLines(poseFolderPath, strAngles);
+            //}
+        }
         
         
                                                          
