@@ -15,6 +15,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
     using Microsoft.Kinect;
 
 
+
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
@@ -241,6 +242,9 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 
             using (DrawingContext dc = this.drawingGroup.Open())
             {
+                // String to hold the text of the joint angles  to be displayed in the txtCapturedInfo box area
+                String jointInfo = "";
+
                 // Draw a transparent background to set the render size
                 dc.DrawRectangle(Brushes.Black, null, new Rect(0.0, 0.0, RenderWidth, RenderHeight));
 
@@ -253,36 +257,11 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                         if (skel.TrackingState == SkeletonTrackingState.Tracked)
                         {
                             this.DrawBonesAndJoints(skel, dc);
-                            float RH_PositionX = skel.Joints[JointType.HandRight].Position.X;
-                            float RH_PositionY = skel.Joints[JointType.HandRight].Position.Y;
-
-                            float LHPositionX = skel.Joints[JointType.HandLeft].Position.X;
-                            float LHPositionY = skel.Joints[JointType.HandLeft].Position.Y;
-
-                            float Elbow_PositionX = skel.Joints[JointType.ElbowRight].Position.X;
-                            float Elbow_PositionY = skel.Joints[JointType.ElbowRight].Position.Y;
-
-
-
 
 
                             /***************** User-created extensions original code input ****************************************************************/
                             /******************************************************************************************************************************/
-                                                                                                                                                          
-                            //if(numPosesCaptured == 4)                                                                                                     
-                            //{                                                                                                                             
-                            //    for(int i = 0; i < numPosesCaptured; i++)
-                            //    {
-                            //        if(isCurrentFGPose(poseAray[i], skel))
-                            //        {
-                            //            MessageBox.Show("This pose matches pose " + (i + 1) + "/6");
-                            //        }
-                            //    }
-                            //}
-
-
-
-
+        
                             // create a new TimeSpan variable which will hold the amount of time elapsed since the Pose CAPTURED_POSE was captured
                             int numPosesCaptured_LOCAL = numPosesCaptured;
 
@@ -290,10 +269,19 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                             {
                                 numPosesCaptured_LOCAL = numPosesCaptured_LOCAL - 1;
                             }
-
                             TimeSpan capturedTimeElapsed = DateTime.Now - poseAray[numPosesCaptured_LOCAL].timeElapsed;
 
-                            // check to see if the current Pose the kinect is looking at is relatively the same as the Pose CAPTURED_POSE
+
+                            // gathers current on the spot joint data to be displayed in the txtCapturedInfo box area
+                            skeletonPose currentPoseInformation = getPose(skel);
+                            jointInfo = 
+
+
+
+
+
+
+                            /* check to see if the current Pose the kinect is looking at is relatively the same as the Pose CAPTURED_POSE
                             if (isCurrentFGPose(poseAray[numPosesCaptured_LOCAL], skel))
                             {
                                 // if it IS the same Pose, check to see if 10 seconds have elapsed 
@@ -305,7 +293,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                                 {
                                     txtCapturedInfo.Text = "Same pose (before 10) " + capturedTimeElapsed.Seconds.ToString();
                                 }                                                                                                          
-                            }                                                                                                                               
+                            }  */                                                                                                                             
                         }  
                                                                                                                                  
                         /************************************************************************************************************************************/
@@ -458,12 +446,6 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 
 
 
-
-
-
-
-
-
         /*************************************************** User created functions **********************************************************************************/
         /*************************************************************************************************************************************************************/
 
@@ -537,23 +519,16 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             // Create a new skeletonPose by passing the correct skeleton into getPose, where angles will be filled
             skeletonPose capturedPose = getPose(trackedSkeleton);
 
-
-            txtCapturedInfo.Text = "Pose captured!";
-
             // Set the captured pose to a constant to be used elsewhere
             CAPTURED_POSE = capturedPose;
             
 
             // Write the pose joint angles to a unique text file in .\\poses
+            poseAray[numPosesCaptured] = CAPTURED_POSE;
+            numPosesCaptured++;
+            txtCapturedInfo.Text = "Pose added. " + numPosesCaptured + " poses";
             writePoseToFile(CAPTURED_POSE);
-
-            //TO BE REMOVED LATER
-            if (numPosesCaptured <= 5)
-            {
-                poseAray[numPosesCaptured] = CAPTURED_POSE;
-                numPosesCaptured++;
-                txtCapturedInfo.Text = "Pose added. " + numPosesCaptured + "/6 poses";
-            }
+            
             //txtCapturedInfo.Text = "Right elbow angle captured at: " + AngleBetweenJoints(skeletons[INDEX_WITH_THE_DATA].Joints[JointType.ShoulderRight],
             //skeletons[INDEX_WITH_THE_DATA].Joints[JointType.ElbowRight],skeletons[INDEX_WITH_THE_DATA].Joints[JointType.HandRight]);
 
@@ -879,8 +854,9 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         /// </summary>
         /// <param name="p"></param>
         /// <returns>N/A</returns>
-        private void writePoseToFile(skeletonPose p) 
+        private void writePoseToFile(skeletonPose p)
         {
+
             //Creating an array of joint angles
             double[] angles = new double[15];
 
@@ -903,13 +879,15 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             }
 
             //Pop-up window prompt to ask if the captured pose should be saved or not
-            if (MessageBox.Show("Save this pose?\n\n" + promptAngles, "Save Pose", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+            /*if (MessageBox.Show("Save this pose?\n\n" + promptAngles, "Save Pose", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
             {
+
+
                 //Creating a new path/name for each new pose
                 String poseFolderPath = POSES_FOLDER_PATH + numPosesCaptured + ".txt";
                 //Write out the string angles to the text file
                 System.IO.File.WriteAllLines(poseFolderPath, strAngles);
-            }
+            }*/
 
 
 
