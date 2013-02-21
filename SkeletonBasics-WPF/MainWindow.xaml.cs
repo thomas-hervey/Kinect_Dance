@@ -262,24 +262,36 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                             /***************** User-created extensions original code input ****************************************************************/
                             /******************************************************************************************************************************/
         
-                            // create a new TimeSpan variable which will hold the amount of time elapsed since the Pose CAPTURED_POSE was captured
+                            //Getting the correct number of poses captured
                             int numPosesCaptured_LOCAL = numPosesCaptured;
-
                             if (numPosesCaptured_LOCAL > 0)
                             {
                                 numPosesCaptured_LOCAL = numPosesCaptured_LOCAL - 1;
                             }
+                            // create a new TimeSpan variable which will hold the amount of time elapsed since the Pose CAPTURED_POSE was captured
                             TimeSpan capturedTimeElapsed = DateTime.Now - poseAray[numPosesCaptured_LOCAL].timeElapsed;
 
 
+
                             // gathers current on the spot joint data to be displayed in the txtCapturedInfo box area
-                            skeletonPose currentPoseInformation = getPose(skel);
-                            jointInfo = 
+                            skeletonPose currentStreamPose = getPose(skel);
 
+                            currentStreamPose.ee
 
+                            double[] angles = new double[15];
 
+                            angles[0] = currentStreamPose.Joints[(int)skeletonPose.JointLabels.rightWristAngle];
+                            angles[1] = currentStreamPose.Joints[(int)skeletonPose.JointLabels.rightElbowAngle];
+                            angles[2] = currentStreamPose.Joints[(int)skeletonPose.JointLabels.rightElbowAngle];
+                            angles[3] = currentStreamPose.Joints[4];
+               
 
-
+                            //Converting the angles to strings for writting to the external txt file
+                            for (int i = 0; i < angles.Length; i++)
+                            {
+                                jointInfo += i + ": " + Convert.ToString(Math.Round(angles[i], 2)) + "\n";
+                            }
+                            txtCapturedInfo.Text = jointInfo;
 
                             /* check to see if the current Pose the kinect is looking at is relatively the same as the Pose CAPTURED_POSE
                             if (isCurrentFGPose(poseAray[numPosesCaptured_LOCAL], skel))
@@ -561,7 +573,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             double RSA = AngleBetweenJoints(skel.Joints[JointType.ShoulderCenter],
                 skel.Joints[JointType.ShoulderRight], skel.Joints[JointType.ElbowRight]);
             pose.Joints[(int)skeletonPose.JointLabels.rightShoulderAngle] = RSA;  // Determines the right shoulder angle
-
+   
 
             /* Left arm joint angles */
             double LWA = AngleBetweenJoints(skel.Joints[JointType.ElbowLeft],
@@ -682,20 +694,19 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                 }
             }
 
-            return isCurrentPose;
 
-
-            /* option 1 /* figure out how to initialize the jointFromName dictionary in a way that C#  
+            // option 1 /* figure out how to initialize the jointFromName dictionary in a way that C#  
             for (int i = 0; i < jointsToCheck.Length; ++i)
             {
-                int j = currentPose.jointFromName[jointsToCheck[i]]; /* joint integer from string name 
+                int j = currentPose.jointFromName[jointsToCheck[i]]; // joint integer from string name 
                 if (!withinRange(currentPose.Joints[j], capturedPose.Joints[j]))
                 {
                     isCurrentPose = false;
                     break;
                 }
             }
-             * */
+
+            return isCurrentPose;            
         }
 
 
