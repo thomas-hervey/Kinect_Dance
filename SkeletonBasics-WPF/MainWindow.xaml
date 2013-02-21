@@ -58,10 +58,11 @@
             <TextBlock DockPanel.Dock="Right" Margin="0 0 -1 0" VerticalAlignment="Bottom" Foreground="{StaticResource MediumGreyBrush}" FontFamily="Segoe UI" FontSize="18">Skeleton Basics</TextBlock>
             <Image Grid.Column="1" Source="Images\Status.png" Stretch="None" HorizontalAlignment="Center" Margin="0 0 0 5"/>
         </DockPanel>
-        <TextBlock Name= "txtNumbers" Background="Cyan" Width="500" Height="80" FontSize="10" RenderTransformOrigin="0.497,0.459">
-            <Button Name="btnCapture" Height="20" Width="50" Content="Capture" Visibility="Visible" Click="btnCapture_Click" />
-            <TextBlock Name="txtCapturedInfo" Background="BurlyWood" Width= "200" Height="75"/>
-        </TextBlock>
+        <TextBlock x:Name= "txtNumbers" Background="Cyan" Width="500" Height="80" FontSize="10" RenderTransformOrigin="0.497,0.459"><InlineUIContainer>
+        		<Button x:Name="btnCapture" Height="19" Width="50" Content="Capture" Visibility="Visible" Click="btnCapture_Click" RenderTransformOrigin="0.5,0.4" />
+        	</InlineUIContainer><Run Text=" "/><InlineUIContainer>
+        		<TextBlock x:Name="txtCapturedInfo" Background="BurlyWood" Width= "438" Height="63"/>
+        	</InlineUIContainer></TextBlock>
         <Viewbox Grid.Row="1" Stretch="Uniform" HorizontalAlignment="Center">
             <Image Name="Image" Width="640" Height="432"/>
         </Viewbox>
