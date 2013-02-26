@@ -13,32 +13,60 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
     using System.Threading;
     using System.Collections.Generic;
     using Microsoft.Kinect;
-
-
-
+    
+    
+    
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
     public partial class MainWindow : Window
     {
-
+        
         /***************** User-created constants and variables *******************************************************************************************/
         /**************************************************************************************************************************************************/
         // variable to hold the captured pose (self-comment: need to eventually create an array of static struct poses that the dancer will know about)  
-        private skeletonPose CAPTURED_POSE;                                                                                                               
+        private skeletonPose CAPTURED_POSE;
+
+        // variable that is constantly updated directly from the skeleton stream
+        private skeletonPose currentStreamPose;
 
         // create an array to hold 6 different poses
         private skeletonPose[] poseAray = new skeletonPose[6];
         private int numPosesCaptured = 0;
 
-        //Path to the text file containing joint names the user wants to check with each according captured pose
+        // Path to the text file containing joint names the user wants to check with each according captured pose
         private String JOINTS_TO_CHECK_PATH = "C:\\Users\\KinectDance\\Documents\\SkeletonRepo\\SkeletonBasics-WPF\\texts\\jointsToCheck\\";
 
         //Path to pose text files folder where pose text files will be written out
         private String POSES_FOLDER_PATH = "C:\\Users\\KinectDance\\Documents\\SkeletonRepo\\SkeletonBasics-WPF\\texts\\poses\\Pose#_";
 
 
+        /// <summary>                                                                                                                                                
+        /// Struct declaration that will house all of the joint angles and time stamp of a skeleton 
+        /// *Note, neckAngle & centerShoulderAngle both use the centerShoulder as the middle 'joint'*
+        /// </summary>
+        struct skeletonPose
+        {
+            /// Map normal names to joint array indices
+            /// </summary>
+            public enum JointLabels
+            {
+                rightWristAngle, rightElbowAngle, rightShoulderAngle, leftWristAngle, leftElbowAngle, leftShoulderAngle, rightAnkleAngle,
+                rightKneeAngle, rightHipAngle, leftAnkleAngle, leftKneeAngle, leftHipAngle, spineAngle, neckAngle, centerShoulderAngle,
+                numJoints
+            };
 
+            // Joints array that holds a pose's angles
+            public double[] Joints;
+
+            // Joint name & index dictionary to store in each pose
+            public Dictionary<string, int> jointFromName;
+
+            // Time variable started when pose is captured in getPose()
+            public DateTime timeElapsed;
+        }
+
+        
 
         /***************************************************************************************************************************************************/
 
@@ -273,25 +301,11 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 
 
 
-                            // gathers current on the spot joint data to be displayed in the txtCapturedInfo box area
-                            skeletonPose currentStreamPose = getPose(skel);
+                            // fills the current pose variable with the appropriate pose data including joint angles, and joint names
+                            currentStreamPose = getPose(skel);
 
-                            currentStreamPose.ee
+                            
 
-                            double[] angles = new double[15];
-
-                            angles[0] = currentStreamPose.Joints[(int)skeletonPose.JointLabels.rightWristAngle];
-                            angles[1] = currentStreamPose.Joints[(int)skeletonPose.JointLabels.rightElbowAngle];
-                            angles[2] = currentStreamPose.Joints[(int)skeletonPose.JointLabels.rightElbowAngle];
-                            angles[3] = currentStreamPose.Joints[4];
-               
-
-                            //Converting the angles to strings for writting to the external txt file
-                            for (int i = 0; i < angles.Length; i++)
-                            {
-                                jointInfo += i + ": " + Convert.ToString(Math.Round(angles[i], 2)) + "\n";
-                            }
-                            txtCapturedInfo.Text = jointInfo;
 
                             /* check to see if the current Pose the kinect is looking at is relatively the same as the Pose CAPTURED_POSE
                             if (isCurrentFGPose(poseAray[numPosesCaptured_LOCAL], skel))
@@ -460,33 +474,6 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 
         /*************************************************** User created functions **********************************************************************************/
         /*************************************************************************************************************************************************************/
-
-        
-        /// <summary>                                                                                                                                                
-        /// Struct declaration that will house all of the joint angles and time stamp of a skeleton 
-        /// *Note, neckAngle & centerShoulderAngle both use the centerShoulder as the middle 'joint'*
-        /// </summary>
-        struct skeletonPose
-        {
-            /// <summary>                                                                                                                                                
-            /// Map normal names to joint array indices
-            /// </summary>
-            public enum JointLabels
-            {
-                rightWristAngle, rightElbowAngle, rightShoulderAngle, leftWristAngle, leftElbowAngle, leftShoulderAngle, rightAnkleAngle,
-                rightKneeAngle, rightHipAngle, leftAnkleAngle, leftKneeAngle, leftHipAngle, spineAngle, neckAngle, centerShoulderAngle,
-                numJoints
-            };
-
-            // Joints array that holds a pose's angles
-            public double[] Joints;            
-
-            // Joint name & index dictionary to store in each pose
-            public Dictionary<string, int> jointFromName;
-            
-            // Time variable started when pose is captured in getPose()
-            public DateTime timeElapsed;
-        }
 
 
         /// <summary>
