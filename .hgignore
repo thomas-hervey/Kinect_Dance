@@ -1,0 +1,11 @@
+syntax: glob
+SkeletonBasics-WPF/.git
+SkeletonBasics-WPF/.gitignore
+SkeletonBasics-WPF/bin/
+SkeletonBasics-WPF/obj/
+SkeletonBasics-WPF/SkeletonBasics-WPF.v11.suo
+SkeletonBasics-WPF/.tfignore
+SkeletonBasics-WPF/jointsToCheck.txt
+SkeletonBasics-WPF/poses/
+dmx/Debug
+dmx/Release
