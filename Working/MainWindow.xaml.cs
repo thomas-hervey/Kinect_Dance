@@ -24,12 +24,26 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 
         /***************** User-created constants and variables *******************************************************************************************/
         /**************************************************************************************************************************************************/
+        
 
-        // variable that is constantly updated directly from the skeleton stream
-        private skeletonPose currentStreamPose;
 
-        // create an array to hold 6 different poses
-        private skeletonPose[] poseArray = new skeletonPose[6];
+
+        /* Match pose and dance function variables */
+
+
+        // skeletonPose variable that is extracted from poseArray when it's found to match currentStreamPose  ***********
+        private skeletonPose matchedSavedPose;
+
+        // Timer that holds the elapsed time since a racognized match  ***********
+        private TimeSpan timeSinceMatch;
+
+
+
+
+        /* On load, saving and capturing variables */
+
+
+        // Pose Capture function counter
         private int numPosesCaptured = 0;
 
         // Path to the text file containing joint names the user wants to check with each according captured pose
@@ -37,6 +51,18 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 
         //Path to pose text files folder where pose text files will be written out
         private String POSES_FOLDER_PATH = "C:\\Users\\KinectDance\\Documents\\SkeletonRepo\\Working\\texts\\poses\\Pose#_";
+
+
+
+
+        /* Stream variables */
+
+
+        // skeletonPose array to hold 6 different poses captured before a performance
+        private skeletonPose[] poseArray = new skeletonPose[6];
+
+        // skeletonPose variable that is constantly updated directly from the skeleton stream
+        private skeletonPose currentStreamPose;
 
         /// <summary>                                                                                                                                                
         /// Struct declaration that will house all of the joint angles and time stamp of a skeleton 
@@ -64,9 +90,8 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             public DateTime timeElapsed;
         }
 
-
-
         /***************************************************************************************************************************************************/
+
 
         /// <summary>
         /// Width of output drawing
@@ -317,13 +342,25 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 
                             // Fills the current pose variable with the appropriate pose data including joint angles, and joint names
                             currentStreamPose = getPose(skel);
+                            
+                            // Compares if the currentStreamPose matches any of the saved poses
+                            int matchingPoseArrayIndex = poseChecker();
 
-                            /* HERE IS WHERE WE NEED TO BE CONSTANTLY CHECKING A POSE ARRAY TO SEE IF currentStreamPose = ANY OF OUR SAVED POSES */
+                            // If there is a match with one of the poses, activate the according dance performance function
+                            if (matchingPoseArrayIndex != 0)
+                            {
+                                // Calls a static lighting functions overseer & structural handler, passing in the matched pose index
+                                staticLightingHandler(matchingPoseArrayIndex);
+                              
+                                //check to see which function we want to do
+                                //set the whole timer situation up
+                            }
 
 
 
+                            /* isCurrentFGPose test function
 
-                            /* check to see if the current Pose the kinect is looking at is relatively the same as the Pose CAPTURED_POSE
+                            // check to see if the current Pose the kinect is looking at is relatively the same as the Pose CAPTURED_POSE
                             if (isCurrentFGPose(poseArray[numPosesCaptured_LOCAL], skel))
                             {
                                 // if it IS the same Pose, check to see if 10 seconds have elapsed 
@@ -490,7 +527,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         /*************************************************************************************************************************************************************/
 
 
-        /* ON LOAD FUNCTIONS */
+        /* *****ON LOAD FUNCTIONS***** */
 
 
         /// <summary>
@@ -514,7 +551,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 
 
 
-        /* CONSTRANT STREAM FUNCTIONS */
+        /* *****CONSTRANT STREAM FUNCTIONS***** */
 
 
         /// <summary>
@@ -629,7 +666,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 
 
 
-        /* CAPTURING & SAVING POSES FUNCTIONS */
+        /* *****CAPTURING & SAVING POSES FUNCTIONS***** */
 
 
         /// <summary>
@@ -640,10 +677,11 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         /// <returns>N/A</returns>
         private void btnCapture_Click(object sender, RoutedEventArgs e)
         {
-            // sign up for the SkeletonFrameReady event when the button is clicked
+            // Sign up for the SkeletonFrameReady event when the button is clicked
             if (this.sensor != null)
             {
-                this.sensor.SkeletonFrameReady += this.CaptureCurrentSkeleton; //this.CaptureCurrentSkeleton
+                // Add the current stream skeleton
+                this.sensor.SkeletonFrameReady += this.CaptureCurrentSkeleton;
             }
             else
                 txtCapturedInfo.Text = "No skeleton present";
@@ -691,21 +729,28 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             //// Create a new Skeleton that is linked to the correct skeleton index
             //Skeleton trackedSkeleton = skeletons[INDEX_WITH_THE_DATA];
 
-            // Create a new skeletonPose by passing the correct skeleton into getPose, where angles will be filled
+
+
+
+
+
+
+
+            // Creates a new skeleton as the current global stream skeleton
             skeletonPose capturedPose = currentStreamPose;
 
 
             /* conditional... put something in here about if and only if the user wants to save this pose */
             
             
-            // Write the pose joint angles to a unique text file in .\\poses
+            // When the capture is a success, print out a message
             txtCapturedInfo.Text = "Pose added. " + numPosesCaptured + " poses";
-            writePoseToFile(capturedPose);
-
-
-
             //txtCapturedInfo.Text = "Right elbow angle captured at: " + AngleBetweenJoints(skeletons[INDEX_WITH_THE_DATA].Joints[JointType.ShoulderRight],
             //skeletons[INDEX_WITH_THE_DATA].Joints[JointType.ElbowRight],skeletons[INDEX_WITH_THE_DATA].Joints[JointType.HandRight]);
+
+
+            // Write the pose joint angles to a unique text file in .\\poses
+            writePoseToFile(capturedPose);
 
             // sign-out of the event
             this.sensor.SkeletonFrameReady -= this.CaptureCurrentSkeleton;
@@ -718,10 +763,10 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         /// <returns>N/A</returns>
         private void writePoseToFile(skeletonPose p)
         {
-            //increase the poses captured counter
+            // Increase the poses captured counter
             numPosesCaptured++;
 
-            //Creating an array of joint angles
+            // Creating an array of double joint angles
             double[] angles = new double[15];
 
             angles[0] = p.Joints[0]; angles[1] = p.Joints[1]; angles[2] = p.Joints[2]; angles[3] = p.Joints[3];
@@ -729,22 +774,23 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             angles[8] = p.Joints[8]; angles[9] = p.Joints[9]; angles[10] = p.Joints[10]; angles[11] = p.Joints[11];
             angles[12] = p.Joints[12]; angles[13] = p.Joints[13]; angles[14] = p.Joints[14];
 
-            //Creating an array that will hold the converted toString angles
+            // Creating an array that will hold the converted toString angles
             String[] strAngles = new String[15];
 
-            //String that will hold the concatenated angles as a string in display in a pop-up
+            // String that will hold the concatenated angles as a string in display in a pop-up
             String promptAngles = "";
 
-            //Converting the angles to strings for writting to the external txt file
+            // Converting the angles to strings for writting to the external txt file
             for (int i = 0; i < angles.Length; i++)
             {
                 strAngles[i] = Convert.ToString(angles[i]) + "\n";
                 promptAngles += i + ": " + Convert.ToString(angles[i]) + "\n";
             }
 
-            //Creating a new path/name for each new pose
+            // Creating a new path/name for each new pose
             String poseFolderPath = POSES_FOLDER_PATH + numPosesCaptured + ".txt";
-            //Write out the string angles to the text file
+            
+            // Write out the string angles to the text file
             System.IO.File.WriteAllLines(poseFolderPath, strAngles);
 
         }
@@ -754,15 +800,40 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 
 
 
-        /* POSE COMPARISON & LIVE PERFORMANCE FUNCTIONS */
+        /* *****POSE COMPARISON & LIVE PERFORMANCE FUNCTIONS***** */
 
+
+        /// <summary>
+        /// Loop function that searches all of the poses in the array to see if any pose matches the currentStreamPose
+        /// </summary>
+        /// <returns>matchingPoseArrayIndex: index in poseArray of a pose that matches the currentStreamPose</returns>
+        private int poseChecker() 
+        {
+            // Declare variable that will hold the index of a pose if it's a match
+            int matchingPoseArrayIndex = 0;
+
+            // for each of the poses in poseArray, see if it's a match to the currentStreamPose by checking isCurrentPose
+            foreach (skeletonPose p in poseArray) 
+            {
+                // If the current pose in the array matches, return that index and break
+                if(isCurrentPose(poseArray[p], currentStreamPose, ))
+                {
+                    matchingPoseArrayIndex = poseArray[p];
+                    return matchingPoseArrayIndex;
+                    break;
+                    // need to break the foreach loop
+                }
+            }
+
+            return matchingPoseArrayIndex;
+        }
 
         /// <summary>
         /// Checks to see if the desired checkable angles in the captured pose is the same (within 20degrees) of the current pose from the stream
         /// </summary>
         /// <param name="capturedPose"></param>
         /// <param name="currentSkel"></param>
-        /// /// <param name="jointsToCheckPoseNumber"></param>
+        /// <param name="jointsToCheckPoseNumber"></param>
         /// <returns>isCurrentPose: validity of comparison between the poses</returns>
         private Boolean isCurrentPose(skeletonPose capturedPose, skeletonPose currentStreamPose, string jointsToCheckPoseNumber)
         {
@@ -839,7 +910,24 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 
 
 
-        /* TEST FUNCTIONS */
+        /* *****LIGHTING FUNCTIONS***** */
+
+        /// <summary>
+        /// Static lighting functions overseer & structural handler
+        /// </summary>
+        /// <param name="macthingPoseArrayIndex"></param>
+        /// <returns>N/A</returns>
+        private void staticLightingHandler(int matchingPoseArrayIndex)
+        {
+            // Save off the matching saved pose from poseArray globally
+            matchedSavedPose = poseArray[matchingPoseArrayIndex];
+        }
+
+
+
+
+
+        /* *****TEST FUNCTIONS***** */
 
 
         /// <summary>
@@ -861,7 +949,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 
 
 
-        /* UTILITY FUNCTIONS */
+        /* *****UTILITY FUNCTIONS***** */
 
 
         /// <summary>
