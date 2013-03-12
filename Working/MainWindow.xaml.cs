@@ -13,6 +13,9 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
     using System.Threading;
     using System.Collections.Generic;
     using Microsoft.Kinect;
+    //Zachs DMX Stuff
+    using DmxComm;
+
 
 
 
@@ -22,6 +25,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
     public partial class MainWindow : Window
     {
 
+        DmxDriver dmxdev = new DmxDriver(150);
         /***************** User-created constants and variables *******************************************************************************************/
         /**************************************************************************************************************************************************/
         
@@ -231,6 +235,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             {
                 if (potentialSensor.Status == KinectStatus.Connected)
                 {
+                  
                     this.sensor = potentialSensor;
                     break;
                 }
@@ -349,6 +354,11 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                             // This contains the skeleton data for the skeleton currently in the stream
                             currentStreamPose = getPose(skel);
 
+                            if (currentStreamPose.Joints[1] > 70 && currentStreamPose.Joints[1] < 110)
+                            {
+                                txtCapturedInfo.Text = "YAY POSE";
+                                doTestFunction();
+                            }
 
                             // Compares if the currentStreamPose matches any of the saved poses
                             //int matchingPoseArrayIndex = poseChecker();
@@ -996,6 +1006,16 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         }
 
 
+
+
+        private void doTestFunction()
+        {
+            dmxdev.setLampOn();
+            dmxdev.setDimmerLevel(255);
+            dmxdev.setPan(0);
+            dmxdev.setTilt(-120);
+            dmxdev.sendData();
+        }
 
 
 
