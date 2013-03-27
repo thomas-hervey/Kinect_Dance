@@ -11,7 +11,7 @@ FT_HANDLE device_handle = NULL ;
 enum color_t {WHITE = 0, CTC = 12, YELLOW = 24, BLUE_104 = 36, PINK = 48, GREEN_206 = 60, BLUE_108 = 72, RED = 84, MAGENTA = 96, BLUE_101 = 108, GREEN_202 = 132, PURPLE = 144};
 
 
-void setColorContinuous(unsigned char *packet, int base, color_t c){
+__declspec(dllexport) void setColorContinuous(unsigned char *packet, int base, color_t c){
 	int COLOR_CHANNEL = 3;
 
 	
@@ -35,7 +35,7 @@ void setColorContinuous(unsigned char *packet, int base, color_t c){
 
 enum speed_t {FAST = 248, MEDIUM = 251, SLOW = 255};
 
-void setRandomColors(unsigned char *packet, speed_t speed, int base){
+__declspec(dllexport) void setRandomColors(unsigned char *packet, speed_t speed, int base){
 	int COLOR_CHANNEL = 3;
 	switch(speed){
 	case FAST:
@@ -46,35 +46,35 @@ void setRandomColors(unsigned char *packet, speed_t speed, int base){
 	}
 }
 
-void setLampOn(unsigned char *packet, int base){
+__declspec(dllexport) void setLampOn(unsigned char *packet, int base){
 	int DMX_LAMP_ON = 237;
 	int LAMP_ON_CHANNEL = 1;
 
 	packet[base + LAMP_ON_CHANNEL - 1] = DMX_LAMP_ON;
 }
 
-void setLampOff(unsigned char *packet, int base){
+__declspec(dllexport) void setLampOff(unsigned char *packet, int base){
 	int DMX_LAMP_OFF = 254;
 	int DMX_LAMP_OFF_CHANNEL = 1;
 
 	packet[base + DMX_LAMP_OFF_CHANNEL - 1] = DMX_LAMP_OFF;
 }
 
-void setShutterOpen(unsigned char *packet, int base){
+__declspec(dllexport) void setShutterOpen(unsigned char *packet, int base){
 	int DMX_SHUTTER_OPEN = 49;
 	int DMX_SHUTTER_CHANNEL = 1;
 
 	packet[base + DMX_SHUTTER_CHANNEL - 1] = DMX_SHUTTER_OPEN;
 }
 
-void setShutterClose(unsigned char *packet, int base){
+__declspec(dllexport) void setShutterClose(unsigned char *packet, int base){
 	int DMX_SHUTTER_CLOSE = 2;
 	int DMX_SHUTTER_CHANNEL = 1;
 
 	packet[base + DMX_SHUTTER_CHANNEL - 1] = DMX_SHUTTER_CLOSE;
 }
 
-void setDimmerLevel(unsigned char *packet, int base, int level){
+__declspec(dllexport) void setDimmerLevel(unsigned char *packet, int base, int level){
 	int DMX_DIMMER_CHANNEL = 2;
 
 	if(level >= 0 && level <= 255){
@@ -85,7 +85,7 @@ void setDimmerLevel(unsigned char *packet, int base, int level){
 //only using standard gobos for now
 static int GOBO_COUNT = 8;
 static int GOBO_CHANNEL = 4;
-void setGoboStandard(unsigned char *packet, int base, int goboVal){
+__declspec(dllexport) void setGoboStandard(unsigned char *packet, int base, int goboVal){
 	int dmxGoboVals[] = {19,29,39,49,59,69,79,85};
 	
 	if(goboVal <= GOBO_COUNT && goboVal >= 0){
@@ -94,7 +94,7 @@ void setGoboStandard(unsigned char *packet, int base, int goboVal){
 }
 
 //valid for standard and indexed mode
-void clearGobo(unsigned char *packet, int base){
+__declspec(dllexport) void clearGobo(unsigned char *packet, int base){
 	packet[base + GOBO_CHANNEL - 1] = 0;
 }
 static int MAX_FOCUS = 255;
@@ -102,21 +102,21 @@ static int MIN_FOCUS = 0;
 static int FOCUS_CHANNEL = 6;
 
 //focus 0 = infinity, 255 = 2 meters
-void setFocus(unsigned char *packet, int base, int focus){
+__declspec(dllexport) void setFocus(unsigned char *packet, int base, int focus){
 	if(focus >= MIN_FOCUS && focus <= MAX_FOCUS){
 		packet[base + FOCUS_CHANNEL - 1] = focus;
 	}
 }
 
 static int PRISM_CHANNEL = 7;
-void setPrismOff(unsigned char *packet, int base){
+__declspec(dllexport) void setPrismOff(unsigned char *packet, int base){
 	packet[base + PRISM_CHANNEL - 1] = 0;
 }
 
 //intensity range 0-59
 enum rotation_direction_t {CW, CCW};
 
-void setPrismRotate(unsigned char *packet, int base, rotation_direction_t direction, int intensity){
+__declspec(dllexport) void setPrismRotate(unsigned char *packet, int base, rotation_direction_t direction, int intensity){
 	int temp;
 	if(direction == CCW){
 			packet[PRISM_CHANNEL + base - 1] = intensity + 20;
@@ -134,7 +134,7 @@ static int MAX_PAN = 127;
 static int PAN_CHANNEL = 8;
 
 //negative values go left, positive right, 0 is neutral
-void setPan(unsigned char *packet, int base, int panVal){
+__declspec(dllexport) void setPan(unsigned char *packet, int base, int panVal){
 	if(panVal >= MIN_PAN && panVal <= MAX_PAN){
 		packet[PAN_CHANNEL + base - 1] = panVal + 128;
 	}
@@ -144,7 +144,7 @@ static int MIN_TILT = -128;
 static int MAX_TILT = 127;
 static int TILT_CHANNEL = 10;
 
-void setTilt(unsigned char *packet, int base, int tiltVal){
+__declspec(dllexport) void setTilt(unsigned char *packet, int base, int tiltVal){
 	if(tiltVal >= MIN_TILT && tiltVal <= MAX_TILT){
 		packet[TILT_CHANNEL + base - 1] = tiltVal + 128;
 	}

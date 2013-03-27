@@ -4,8 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using FTD2XX_NET;
-using System.Runtime.InteropServices;
-using System.Threading;
+using System.Runtime.InteropServices; 
+
 namespace DmxComm
 {
     class DmxDriver
@@ -14,8 +14,6 @@ namespace DmxComm
         private bool connected;
         private FTDI device;
         private int startAddr;
-        private int bytesWritten = 0;
-        Thread txThread;
 
         private byte[] packet;
         public DmxDriver(int baseDmxAddr)
@@ -39,52 +37,23 @@ namespace DmxComm
             {
                 packet[i] = 0;
             }
-
-            txThread = new Thread(new ThreadStart(writeData));
-            txThread.Start();
-            Console.WriteLine("exiting DMX constructor");
-            
-        }
-
-        public static bool done = false;
-
-        /// <summary>
-        /// thread infinitely loops over this for device communications
-        /// </summary>
-        private void writeData()
-        {
-            
-            while (!done)
-            {
-                //Console.WriteLine("thread writedata loop");
-                initDMX();
-                device.SetBreak(true);
-                device.SetBreak(false);
-                this.sendData();
-                System.Threading.Thread.Sleep(20);
-                
-            }
-        }
-
-        private void initDMX()
-        {
+            //turn off bit bang mode
+            device.SetBitMode(0x00, 0);
             device.ResetDevice();
-            //device.SetBaudRate(921600);//may not be correct, the setDivisor function isn't exposed
-            device.SetDataCharacteristics(FTDI.FT_DATA_BITS.FT_BITS_8, FTDI.FT_STOP_BITS.FT_STOP_BITS_2, FTDI.FT_PARITY.FT_PARITY_NONE);
+            device.Purge(FTDI.FT_PURGE.FT_PURGE_RX | FTDI.FT_PURGE.FT_PURGE_TX);
+            device.SetBaudRate(9600);
+            device.SetTimeouts(1000, 1000);
+            device.SetDataCharacteristics(FTDI.FT_DATA_BITS.FT_BITS_8, FTDI.FT_STOP_BITS.FT_STOP_BITS_1, FTDI.FT_PARITY.FT_PARITY_NONE);
             device.SetFlowControl(FTDI.FT_FLOW_CONTROL.FT_FLOW_NONE, 0, 0);
-            device.SetRTS(false);//clrRts
-            device.Purge(FTDI.FT_PURGE.FT_PURGE_TX);
-            device.Purge(FTDI.FT_PURGE.FT_PURGE_RX);
+            device.SetLatency(2);
+
 
         }
 
-        private int write(){
-            uint bytesWritten = 0;
-            FTDI.FT_STATUS result = device.Write(packet, DMX_PACKET_SIZE, ref bytesWritten);
-            return (int)bytesWritten;
+        ~DmxDriver()
+        {
+            device.Close();
         }
-
-        
 
         public bool deviceConnected()
         {
@@ -105,12 +74,12 @@ namespace DmxComm
            
             FTDI.FT_STATUS result;
             result = device.Write(header, 4, ref written);//send dmx header
-            //Console.WriteLine(result);
-            //Console.WriteLine(written);
+            Console.WriteLine(result);
+            Console.WriteLine(written);
            
             result = device.Write(packet, 513, ref written);//send data array
-            //Console.WriteLine(result);
-            //Console.WriteLine(written);
+            Console.WriteLine(result);
+            Console.WriteLine(written);
             
             byte[] endcode = new byte[1];
             endcode[0] = 0xE7;
