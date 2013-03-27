@@ -46,3 +46,15 @@ C:\Users\KinectDance\Documents\SkeletonRepo\Working\obj\Debug\Microsoft.Samples.
 C:\Users\KinectDance\Documents\SkeletonRepo\Working\obj\Debug\SkeletonBasics-WPF.csproj.GenerateResource.Cache
 C:\Users\KinectDance\Documents\SkeletonRepo\Working\bin\Debug\SkeletonBasics-WPF.exe
 C:\Users\KinectDance\Documents\SkeletonRepo\Working\bin\Debug\SkeletonBasics-WPF.pdb
+C:\Users\Thomas\Desktop\zachs\kinectdance\Working\obj\Debug\SkeletonBasics-WPF.exe
+C:\Users\Thomas\Desktop\zachs\kinectdance\Working\obj\Debug\SkeletonBasics-WPF.pdb
+C:\Users\Thomas\Desktop\zachs\kinectdance\Working\obj\Debug\SkeletonBasics-WPF.csprojResolveAssemblyReference.cache
+C:\Users\Thomas\Desktop\zachs\kinectdance\Working\obj\Debug\MainWindow.baml
+C:\Users\Thomas\Desktop\zachs\kinectdance\Working\obj\Debug\MainWindow.g.cs
+C:\Users\Thomas\Desktop\zachs\kinectdance\Working\obj\Debug\App.g.cs
+C:\Users\Thomas\Desktop\zachs\kinectdance\Working\obj\Debug\SkeletonBasics-WPF_MarkupCompile.cache
+C:\Users\Thomas\Desktop\zachs\kinectdance\Working\obj\Debug\SkeletonBasics-WPF.g.resources
+C:\Users\Thomas\Desktop\zachs\kinectdance\Working\obj\Debug\Microsoft.Samples.Kinect.SkeletonBasics.Properties.Resources.resources
+C:\Users\Thomas\Desktop\zachs\kinectdance\Working\obj\Debug\SkeletonBasics-WPF.csproj.GenerateResource.Cache
+C:\Users\Thomas\Desktop\zachs\kinectdance\Working\bin\Debug\SkeletonBasics-WPF.exe
+C:\Users\Thomas\Desktop\zachs\kinectdance\Working\bin\Debug\SkeletonBasics-WPF.pdb
