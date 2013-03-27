@@ -9,3 +9,9 @@ SkeletonBasics-WPF/jointsToCheck.txt
 SkeletonBasics-WPF/poses/
 dmx/Debug
 dmx/Release
+obj
+bin
+Debug
+Release
+*.suo
+poses

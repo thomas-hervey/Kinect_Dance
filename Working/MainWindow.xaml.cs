@@ -5,15 +5,16 @@
 //------------------------------------------------------------------------------
 namespace Microsoft.Samples.Kinect.SkeletonBasics
 {
-    using System.IO;
     using System;
+    using System.IO;
     using System.Windows;
     using System.Windows.Media;
+    using System.Windows.Forms;
     using System.Diagnostics;
     using System.Threading;
     using System.Collections.Generic;
     using Microsoft.Kinect;
-    //Zachs DMX Stuff
+    // Zachs DMX
     using DmxComm;
 
 
@@ -25,10 +26,12 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
     public partial class MainWindow : Window
     {
 
-        DmxDriver dmxdev = new DmxDriver(150);
         /***************** User-created constants and variables *******************************************************************************************/
         /**************************************************************************************************************************************************/
-        
+
+        // Zach's DMX Object
+        DmxDriver dmxdev = new DmxDriver(150);
+
 
 
 
@@ -37,7 +40,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 
         // skeletonPose variable that is extracted from poseArray when it's found to match currentStreamPose  ***********
         private skeletonPose matchedSavedPose;
-
+        
         // Timer that holds the elapsed time since a racognized match  ***********
         private TimeSpan timeSinceMatch;
 
@@ -49,10 +52,10 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 
         // Pose Capture function counter
         private int numPosesCaptured = 0;
-
+        
         // Path to the text file containing joint names the user wants to check with each according captured pose
         private String JOINTS_TO_CHECK_PATH = "C:\\Users\\KinectDance\\Documents\\SkeletonRepo\\Working\\texts\\jointsToCheck\\";
-
+        
         //Path to pose text files folder where pose text files will be written out
         private String POSES_FOLDER_PATH = "C:\\Users\\KinectDance\\Documents\\SkeletonRepo\\Working\\texts\\poses\\Pose#_";
 
@@ -83,12 +86,18 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                 numJoints
             };
 
-            // Joints array that holds a pose's angles
+            // turn integer into a name as skeletonPose.Names[i]
+            public string[] Names = {"rightWristAngle", "rightElbowAngle", "rightShoulderAngle", "leftWristAngle", "leftElbowAngle", "leftShoulderAngle", "rightAnkleAngle",
+                "rightKneeAngle", "rightHipAngle", "leftAnkleAngle", "leftKneeAngle", "leftHipAngle", "spineAngle", "neckAngle", "centerShoulderAngle"};
+
+            // Joints array that holds a pose's joint angles
             public double[] Joints;
 
-            // Joint name & index dictionary to store in each pose
-            public Dictionary<string, int> jointFromName;
+            // Tolerance array that holds how close a pose needs to be for each joint
+            public double[] Tolerance;
 
+            // turn string name into an integer index as jointFromName["rightWristAngle"]
+            public Dictionary<string, int> jointFromName;
 
             // Time variable started when pose is captured in getPose()
             public DateTime timeElapsed;
@@ -266,25 +275,25 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             }
 
             //Added on load function to check if the user wants to use prerecorded poses or create new ones
-            if (containsPoseFiles())
-            {
-                /* Prompt the user and ask if they want to start a new recording session
-                 * or if they want to use the current poses in '.../poses'
-                 */
+            //if (containsPoseFiles())
+            //{
+            //    /* Prompt the user and ask if they want to start a new recording session
+            //     * or if they want to use the current poses in '.../poses'
+            //     */
 
-                /* If they want to start a new recording session, just continue on
-                 * with the program as usual (capture button enabled)
-                 */
+            //    /* If they want to start a new recording session, just continue on
+            //     * with the program as usual (capture button enabled)
+            //     */
 
-                /* If they want to dance then disable capture button and load '.../poses' files
-                 * into poseArray
-                 */
-                btnCapture.IsEnabled = false;
+            //    /* If they want to dance then disable capture button and load '.../poses' files
+            //     * into poseArray
+            //     */
+            //    btnCapture.IsEnabled = false;
               
-                fillPoseArray();
-                //poseArray is now filled with the text file poses
+            //    fillPoseArray();
+            //    //poseArray is now filled with the text file poses
 
-            }
+            //}
         }
 
         /// <summary>
@@ -354,6 +363,9 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                             // This contains the skeleton data for the skeleton currently in the stream
                             currentStreamPose = getPose(skel);
 
+
+
+                            // NON FILE LIGHTING EFFECT TEST FUNCTION
                             if (currentStreamPose.Joints[1] > 70 && currentStreamPose.Joints[1] < 110)
                             {
                                 txtCapturedInfo.Text = "YAY POSE";
@@ -374,6 +386,8 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                                 //set the whole timer situation up
                             }
                             */
+
+
 
 
                             /* isCurrentFGPose test function
@@ -407,7 +421,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                     }
                 }
 
-                // prevent drawing outside of our render area
+                // prevent drawing outside of our render areaoa
                 this.drawingGroup.ClipGeometry = new RectangleGeometry(new Rect(0.0, 0.0, RenderWidth, RenderHeight));
             }
         }
@@ -545,9 +559,47 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         /*************************************************************************************************************************************************************/
 
 
-        /* *****ON LOAD FUNCTIONS***** */
+        /* *****LOAD POSE FUNCTIONS***** */
 
 
+        /// <summary>
+        /// Function to load poses from the openBox path once the user has specified a path
+        /// </summary>
+        /// <returns> N/A </returns>
+        private void LoadPose(object sender, RoutedEventArgs e)
+        {
+            // Open file dialog to get the pose text to open
+            OpenFileDialog openFile = new OpenFileDialog();
+            openFile.ShowDialog();
+            // Save fileName path as a string
+            String filePath = openFile.FileName;
+
+            // Create a stream reader to read from the newly opened file
+            StreamReader streamReader = new StreamReader(filePath);
+
+            // Creating a new pose that'll be filled with loaded pose joint angle information
+            skeletonPose poseToFill = new skeletonPose();
+            // Initilizing the dictionary for our new pose
+            poseToFill = fillJointNames();
+
+            // Delimiters to break up the components on each line of the pose text file
+            char[] delimiters = { ' ',':' };
+            // String that'll hold each line of the pose text file
+            string line;
+            // Read and display lines from the file until the end of the file is reached
+            while ((line = streamReader.ReadLine()) != null) 
+            {
+                string[] words = line.Split(delimiters);
+                int whichJoint = poseToFill.jointFromName[words[0]];            // joint name = first word of line
+                poseToFill.Joints[whichJoint] = Convert.ToDouble[words[1]];     // joint angle = second word
+                poseToFill.Tolerance[whichJoint] = Convert.ToDouble[words[2]];  // joint tolerance = third word
+
+            }
+            streamReader.Close();
+        }
+
+
+        /*
         /// <summary>
         /// ONLOAD function that checks if there are poses already saved
         /// </summary>
@@ -562,7 +614,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             }
             return containsPoseFiles;
         }
-
+        */
         
         
         /// <summary>
@@ -571,6 +623,11 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         /// <returns>N/A</returns>
         private void fillPoseArray()
         {
+
+
+
+
+            /*
             //string[] files = Directory.GetFiles(POSES_FOLDER_PATH, "");
             String pose1Path = POSES_FOLDER_PATH + "1.txt";
             string[] files = new  string[5];
@@ -602,6 +659,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                 poseArraySize++;
             }
             txtCapturedInfo.Text = "Pose 1 RWA: " + poseArray[0].Joints[0];
+             */
         }
         
 
@@ -700,22 +758,22 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             // Initilize the Joints array
             filledPose.Joints = new double[(int)skeletonPose.JointLabels.numJoints];
 
-            filledPose.jointFromName.Add("rightWristAngle", Convert.ToInt32(skeletonPose.JointLabels.rightWristAngle));
-            filledPose.jointFromName.Add("rightElbowAngle", Convert.ToInt32(skeletonPose.JointLabels.rightElbowAngle));
-            filledPose.jointFromName.Add("rightShoulderAngle", Convert.ToInt32(skeletonPose.JointLabels.rightShoulderAngle));
-            filledPose.jointFromName.Add("leftWristAngle", Convert.ToInt32(skeletonPose.JointLabels.leftWristAngle));
-            filledPose.jointFromName.Add("leftElbowAngle", Convert.ToInt32(skeletonPose.JointLabels.leftElbowAngle));
-            filledPose.jointFromName.Add("leftShoulderAngle", Convert.ToInt32(skeletonPose.JointLabels.leftShoulderAngle));
-            filledPose.jointFromName.Add("rightAnkleAngle", Convert.ToInt32(skeletonPose.JointLabels.rightAnkleAngle));
-            filledPose.jointFromName.Add("rightKneeAngle", Convert.ToInt32(skeletonPose.JointLabels.rightKneeAngle));
-            filledPose.jointFromName.Add("rightHipAngle", Convert.ToInt32(skeletonPose.JointLabels.rightHipAngle));
-            filledPose.jointFromName.Add("leftAnkleAngle", Convert.ToInt32(skeletonPose.JointLabels.leftAnkleAngle));
-            filledPose.jointFromName.Add("leftKneeAngle", Convert.ToInt32(skeletonPose.JointLabels.leftKneeAngle));
-            filledPose.jointFromName.Add("leftHipAngle", Convert.ToInt32(skeletonPose.JointLabels.leftHipAngle));
-            filledPose.jointFromName.Add("spineAngle", Convert.ToInt32(skeletonPose.JointLabels.spineAngle));
-            filledPose.jointFromName.Add("neckAngle", Convert.ToInt32(skeletonPose.JointLabels.neckAngle));
-            filledPose.jointFromName.Add("centerShoulderAngle", Convert.ToInt32(skeletonPose.JointLabels.centerShoulderAngle));
-            filledPose.jointFromName.Add("numJoints", Convert.ToInt32(skeletonPose.JointLabels.numJoints));
+            filledPose.jointFromName.Add(filledPose.Names[0], Convert.ToInt32(skeletonPose.JointLabels.rightWristAngle));
+            filledPose.jointFromName.Add(filledPose.Names[1], Convert.ToInt32(skeletonPose.JointLabels.rightElbowAngle));
+            filledPose.jointFromName.Add(filledPose.Names[2], Convert.ToInt32(skeletonPose.JointLabels.rightShoulderAngle));
+            filledPose.jointFromName.Add(filledPose.Names[3], Convert.ToInt32(skeletonPose.JointLabels.leftWristAngle));
+            filledPose.jointFromName.Add(filledPose.Names[4], Convert.ToInt32(skeletonPose.JointLabels.leftElbowAngle));
+            filledPose.jointFromName.Add(filledPose.Names[5], Convert.ToInt32(skeletonPose.JointLabels.leftShoulderAngle));
+            filledPose.jointFromName.Add(filledPose.Names[6], Convert.ToInt32(skeletonPose.JointLabels.rightAnkleAngle));
+            filledPose.jointFromName.Add(filledPose.Names[7], Convert.ToInt32(skeletonPose.JointLabels.rightKneeAngle));
+            filledPose.jointFromName.Add(filledPose.Names[8], Convert.ToInt32(skeletonPose.JointLabels.rightHipAngle));
+            filledPose.jointFromName.Add(filledPose.Names[9], Convert.ToInt32(skeletonPose.JointLabels.leftAnkleAngle));
+            filledPose.jointFromName.Add(filledPose.Names[10], Convert.ToInt32(skeletonPose.JointLabels.leftKneeAngle));
+            filledPose.jointFromName.Add(filledPose.Names[11], Convert.ToInt32(skeletonPose.JointLabels.leftHipAngle));
+            filledPose.jointFromName.Add(filledPose.Names[12], Convert.ToInt32(skeletonPose.JointLabels.spineAngle));
+            filledPose.jointFromName.Add(filledPose.Names[13], Convert.ToInt32(skeletonPose.JointLabels.neckAngle));
+            filledPose.jointFromName.Add(filledPose.Names[14], Convert.ToInt32(skeletonPose.JointLabels.centerShoulderAngle));
+            filledPose.jointFromName.Add(filledPose.Names[15], Convert.ToInt32(skeletonPose.JointLabels.numJoints));
 
             return filledPose;
         }
@@ -734,7 +792,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         /// <param name="sender"></param>
         /// <param name="e"></param>
         /// <returns>N/A</returns>
-        private void btnCapture_Click(object sender, RoutedEventArgs e)
+        private void CapturePose(object sender, RoutedEventArgs e)
         {
             // Sign up for the SkeletonFrameReady event when the button is clicked
             if (this.sensor != null)
@@ -822,16 +880,12 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         /// <returns>N/A</returns>
         private void writePoseToFile(skeletonPose p)
         {
+            OpenFileDialog openFile = new OpenFileDialog();
+
+
+            StreamWriter streamWriter = new StreamWriter;
             // Increase the poses captured counter
             numPosesCaptured++;
-
-            // Creating an array of double joint angles
-            double[] angles = new double[15];
-
-            angles[0] = p.Joints[0]; angles[1] = p.Joints[1]; angles[2] = p.Joints[2]; angles[3] = p.Joints[3];
-            angles[4] = p.Joints[4]; angles[5] = p.Joints[5]; angles[6] = p.Joints[6]; angles[7] = p.Joints[7];
-            angles[8] = p.Joints[8]; angles[9] = p.Joints[9]; angles[10] = p.Joints[10]; angles[11] = p.Joints[11];
-            angles[12] = p.Joints[12]; angles[13] = p.Joints[13]; angles[14] = p.Joints[14];
 
             // Creating an array that will hold the converted toString angles
             String[] strAngles = new String[15];
@@ -840,10 +894,13 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             String promptAngles = "";
 
             // Converting the angles to strings for writting to the external txt file
-            for (int i = 0; i < angles.Length; i++)
+            for (int i = 0; i < p.Joints.Length; i++)
             {
-                strAngles[i] = Convert.ToString(angles[i]) + "\n";
-                promptAngles += i + ": " + Convert.ToString(angles[i]) + "\n";
+                // streamWriter.writeLine(p.Names[i] + " " + Convert.ToString(p.Joints[i]) + " 15");   // when we have a tolerance, we wouldn't have 15 here as a default string
+                
+                
+                strAngles[i] = Convert.ToString(p.Joints[i]) + "\n";  //turn an index back into a name
+                promptAngles += i + ": " + Convert.ToString(p.Joints[i]) + "\n";
             }
 
             // Creating a new path/name for each new pose
@@ -1014,7 +1071,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             dmxdev.setDimmerLevel(255);
             dmxdev.setPan(0);
             dmxdev.setTilt(-120);
-            dmxdev.sendData();
+            //dmxdev.sendData();
         }
 
 
