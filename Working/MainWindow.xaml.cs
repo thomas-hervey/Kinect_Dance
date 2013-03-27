@@ -5,15 +5,16 @@
 //------------------------------------------------------------------------------
 namespace Microsoft.Samples.Kinect.SkeletonBasics
 {
-    using System.IO;
     using System;
+    using System.IO;
     using System.Windows;
     using System.Windows.Media;
+    using System.Windows.Forms;
     using System.Diagnostics;
     using System.Threading;
     using System.Collections.Generic;
     using Microsoft.Kinect;
-    //Zachs DMX Stuff
+    // Zachs DMX
     using DmxComm;
 
 
@@ -25,10 +26,12 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
     public partial class MainWindow : Window
     {
 
-        DmxDriver dmxdev = new DmxDriver(150);
         /***************** User-created constants and variables *******************************************************************************************/
         /**************************************************************************************************************************************************/
-        
+
+        // Zach's DMX Object
+        DmxDriver dmxdev = new DmxDriver(150);
+
 
 
 
@@ -37,7 +40,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 
         // skeletonPose variable that is extracted from poseArray when it's found to match currentStreamPose  ***********
         private skeletonPose matchedSavedPose;
-
+        
         // Timer that holds the elapsed time since a racognized match  ***********
         private TimeSpan timeSinceMatch;
 
@@ -49,10 +52,10 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 
         // Pose Capture function counter
         private int numPosesCaptured = 0;
-
+        
         // Path to the text file containing joint names the user wants to check with each according captured pose
         private String JOINTS_TO_CHECK_PATH = "C:\\Users\\KinectDance\\Documents\\SkeletonRepo\\Working\\texts\\jointsToCheck\\";
-
+        
         //Path to pose text files folder where pose text files will be written out
         private String POSES_FOLDER_PATH = "C:\\Users\\KinectDance\\Documents\\SkeletonRepo\\Working\\texts\\poses\\Pose#_";
 
@@ -88,7 +91,6 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 
             // Joint name & index dictionary to store in each pose
             public Dictionary<string, int> jointFromName;
-
 
             // Time variable started when pose is captured in getPose()
             public DateTime timeElapsed;
@@ -266,25 +268,25 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             }
 
             //Added on load function to check if the user wants to use prerecorded poses or create new ones
-            if (containsPoseFiles())
-            {
-                /* Prompt the user and ask if they want to start a new recording session
-                 * or if they want to use the current poses in '.../poses'
-                 */
+            //if (containsPoseFiles())
+            //{
+            //    /* Prompt the user and ask if they want to start a new recording session
+            //     * or if they want to use the current poses in '.../poses'
+            //     */
 
-                /* If they want to start a new recording session, just continue on
-                 * with the program as usual (capture button enabled)
-                 */
+            //    /* If they want to start a new recording session, just continue on
+            //     * with the program as usual (capture button enabled)
+            //     */
 
-                /* If they want to dance then disable capture button and load '.../poses' files
-                 * into poseArray
-                 */
-                btnCapture.IsEnabled = false;
+            //    /* If they want to dance then disable capture button and load '.../poses' files
+            //     * into poseArray
+            //     */
+            //    btnCapture.IsEnabled = false;
               
-                fillPoseArray();
-                //poseArray is now filled with the text file poses
+            //    fillPoseArray();
+            //    //poseArray is now filled with the text file poses
 
-            }
+            //}
         }
 
         /// <summary>
@@ -354,6 +356,9 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                             // This contains the skeleton data for the skeleton currently in the stream
                             currentStreamPose = getPose(skel);
 
+
+
+
                             if (currentStreamPose.Joints[1] > 70 && currentStreamPose.Joints[1] < 110)
                             {
                                 txtCapturedInfo.Text = "YAY POSE";
@@ -407,7 +412,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                     }
                 }
 
-                // prevent drawing outside of our render area
+                // prevent drawing outside of our render areaoa
                 this.drawingGroup.ClipGeometry = new RectangleGeometry(new Rect(0.0, 0.0, RenderWidth, RenderHeight));
             }
         }
@@ -547,7 +552,62 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 
         /* *****ON LOAD FUNCTIONS***** */
 
+        /// <summary>
+        /// Function for opening pose dialog box; pose path is displayed in openBox text box
+        /// </summary>
+        /// <returns> N/A </returns>
+        private void OpenPose(object sender, RoutedEventArgs e)
+        {
+            OpenFileDialog openFile = new OpenFileDialog();
+            openFile.ShowDialog();
+            openBox.Text = openFile.FileName;
+        }
 
+        /// <summary>
+        /// Function to load poses from the openBox path once the user has specified a path
+        /// </summary>
+        /// <returns> N/A </returns>
+        private void LoadPose(object sender, RoutedEventArgs e)
+        {
+            StreamReader streamReader = new StreamReader(openBox.Text);
+            Console.WriteLine("opening " + openBox.Text);
+            string line;
+
+            skeletonPose poseToFill = new skeletonPose();
+            poseToFill = fillJointNames();
+
+            // double[] anglesFromFile = new double[14];
+            for (int i = 0; i < 15; i++)
+            {
+
+                line = streamReader.ReadLine();
+                Console.WriteLine(line);
+                poseToFill.Joints[i] = Convert.ToDouble(line);
+                
+                txtCapturedInfo.Text += Convert.ToString(poseToFill.Joints[i]) + " : " + i + '\n';
+            }
+            streamReader.Close();
+
+            /*
+            while ((line = streamReader.ReadLine()) != null)
+            {
+
+            }
+            */
+
+            /*
+            for (int j = 0; j < anglesFromFile.Length; j++)
+            {
+                poseToFill.Joints[(int)skeletonPose.JointLabels.rightWristAngle] = anglesFromFile[i];
+            }
+            */
+            
+            
+
+        }
+
+
+        /*
         /// <summary>
         /// ONLOAD function that checks if there are poses already saved
         /// </summary>
@@ -562,7 +622,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             }
             return containsPoseFiles;
         }
-
+        */
         
         
         /// <summary>
@@ -571,6 +631,11 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         /// <returns>N/A</returns>
         private void fillPoseArray()
         {
+
+
+
+
+            /*
             //string[] files = Directory.GetFiles(POSES_FOLDER_PATH, "");
             String pose1Path = POSES_FOLDER_PATH + "1.txt";
             string[] files = new  string[5];
@@ -602,6 +667,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                 poseArraySize++;
             }
             txtCapturedInfo.Text = "Pose 1 RWA: " + poseArray[0].Joints[0];
+             */
         }
         
 
@@ -734,7 +800,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         /// <param name="sender"></param>
         /// <param name="e"></param>
         /// <returns>N/A</returns>
-        private void btnCapture_Click(object sender, RoutedEventArgs e)
+        private void CapturePose(object sender, RoutedEventArgs e)
         {
             // Sign up for the SkeletonFrameReady event when the button is clicked
             if (this.sensor != null)
@@ -1014,7 +1080,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             dmxdev.setDimmerLevel(255);
             dmxdev.setPan(0);
             dmxdev.setTilt(-120);
-            dmxdev.sendData();
+            //dmxdev.sendData();
         }
 
 
