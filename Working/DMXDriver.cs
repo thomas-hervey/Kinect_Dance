@@ -37,6 +37,22 @@ namespace DmxComm
             {
                 packet[i] = 0;
             }
+            //turn off bit bang mode
+            device.SetBitMode(0x00, 0);
+            device.ResetDevice();
+            device.Purge(FTDI.FT_PURGE.FT_PURGE_RX | FTDI.FT_PURGE.FT_PURGE_TX);
+            device.SetBaudRate(9600);
+            device.SetTimeouts(1000, 1000);
+            device.SetDataCharacteristics(FTDI.FT_DATA_BITS.FT_BITS_8, FTDI.FT_STOP_BITS.FT_STOP_BITS_1, FTDI.FT_PARITY.FT_PARITY_NONE);
+            device.SetFlowControl(FTDI.FT_FLOW_CONTROL.FT_FLOW_NONE, 0, 0);
+            device.SetLatency(2);
+
+
+        }
+
+        ~DmxDriver()
+        {
+            device.Close();
         }
 
         public bool deviceConnected()
