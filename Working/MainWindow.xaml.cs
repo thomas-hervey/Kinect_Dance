@@ -86,7 +86,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                 numJoints
             };
 
-            // Joints array that holds a pose's angles
+            // Joints array that holds a pose's joint angles
             public double[] Joints;
 
             // Joint name & index dictionary to store in each pose
@@ -358,7 +358,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 
 
 
-
+                            // NON FILE LIGHTING EFFECT TEST FUNCTION
                             if (currentStreamPose.Joints[1] > 70 && currentStreamPose.Joints[1] < 110)
                             {
                                 txtCapturedInfo.Text = "YAY POSE";
@@ -379,6 +379,8 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                                 //set the whole timer situation up
                             }
                             */
+
+
 
 
                             /* isCurrentFGPose test function
@@ -550,13 +552,14 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         /*************************************************************************************************************************************************************/
 
 
-        /* *****ON LOAD FUNCTIONS***** */
+        /* *****LOAD POSE FUNCTIONS***** */
+
 
         /// <summary>
         /// Function for opening pose dialog box; pose path is displayed in openBox text box
         /// </summary>
         /// <returns> N/A </returns>
-        private void OpenPose(object sender, RoutedEventArgs e)
+        private void OpenPosePath(object sender, RoutedEventArgs e)
         {
             OpenFileDialog openFile = new OpenFileDialog();
             openFile.ShowDialog();
@@ -576,7 +579,6 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             skeletonPose poseToFill = new skeletonPose();
             poseToFill = fillJointNames();
 
-            // double[] anglesFromFile = new double[14];
             for (int i = 0; i < 15; i++)
             {
 
@@ -589,20 +591,16 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             streamReader.Close();
 
             /*
-            while ((line = streamReader.ReadLine()) != null)
-            {
-
-            }
+            string line;
+                // Read and display lines from the file until the end of  
+                // the file is reached. 
+                while ((line = sr.ReadLine()) != null) 
+                {
+                    
+                }
             */
 
-            /*
-            for (int j = 0; j < anglesFromFile.Length; j++)
-            {
-                poseToFill.Joints[(int)skeletonPose.JointLabels.rightWristAngle] = anglesFromFile[i];
-            }
-            */
-            
-            
+
 
         }
 
