@@ -63,10 +63,6 @@
         <TextBlock x:Name= "txtNumbers" Background="Cyan" FontSize="10" Margin="121,0,0,0"><InlineUIContainer>
         		<Button x:Name="capturePose" Height="23" Width="61" Content="Capture" Visibility="Visible" Click="CapturePose" Cursor="Hand" />
         	</InlineUIContainer><Run Text=" "/><InlineUIContainer>
-        		<Button x:Name="openPosePath" Height="22" Width="75" Content="Open" Visibility="Visible" Click="OpenPosePath" Cursor="Hand"/>
-        	</InlineUIContainer><InlineUIContainer>
-        		<TextBox x:Name="openBox" Height="23" TextWrapping="Wrap" Text="..." Width="120"/>
-        	</InlineUIContainer><InlineUIContainer>
         		<Button x:Name="loadPose" Height="24" Width="67" Content="Load" Visibility="Visible" Click="LoadPose" Cursor="Hand" RenderTransformOrigin="0.5,0.5" />
         	</InlineUIContainer><InlineUIContainer>
         		<TextBlock x:Name="txtCapturedInfo" Background="BurlyWood" Width= "293" Height="81" RenderTransformOrigin="0.628,0.34"/>

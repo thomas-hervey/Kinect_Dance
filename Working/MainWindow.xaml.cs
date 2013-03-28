@@ -87,8 +87,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             };
 
             // turn integer into a name as skeletonPose.Names[i]
-            public string[] Names = {"rightWristAngle", "rightElbowAngle", "rightShoulderAngle", "leftWristAngle", "leftElbowAngle", "leftShoulderAngle", "rightAnkleAngle",
-                "rightKneeAngle", "rightHipAngle", "leftAnkleAngle", "leftKneeAngle", "leftHipAngle", "spineAngle", "neckAngle", "centerShoulderAngle"};
+            public string[] Names;
 
             // Joints array that holds a pose's joint angles
             public double[] Joints;
@@ -591,8 +590,8 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             {
                 string[] words = line.Split(delimiters);
                 int whichJoint = poseToFill.jointFromName[words[0]];            // joint name = first word of line
-                poseToFill.Joints[whichJoint] = Convert.ToDouble[words[1]];     // joint angle = second word
-                poseToFill.Tolerance[whichJoint] = Convert.ToDouble[words[2]];  // joint tolerance = third word
+                //poseToFill.Joints[whichJoint] = Convert.ToDouble[words[1]];     // joint angle = second word
+                //poseToFill.Tolerance[whichJoint] = Convert.ToDouble[words[2]];  // joint tolerance = third word
 
             }
             streamReader.Close();
@@ -752,6 +751,11 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             // Creating a new skeletonPose, filling its dictionary and returning it setting it equal to pose in getPose
             skeletonPose filledPose = new skeletonPose();
 
+            // string array constant to hold the names of the joints 
+            string[] NAMES = {"rightWristAngle", "rightElbowAngle", "rightShoulderAngle", "leftWristAngle", "leftElbowAngle", "leftShoulderAngle", "rightAnkleAngle",
+                "rightKneeAngle", "rightHipAngle", "leftAnkleAngle", "leftKneeAngle", "leftHipAngle", "spineAngle", "neckAngle", "centerShoulderAngle"};
+            filledPose.Names = NAMES;
+
             // Initilizing the jointFromName dictionary 
             filledPose.jointFromName = new Dictionary<string, int>();
 
@@ -773,7 +777,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             filledPose.jointFromName.Add(filledPose.Names[12], Convert.ToInt32(skeletonPose.JointLabels.spineAngle));
             filledPose.jointFromName.Add(filledPose.Names[13], Convert.ToInt32(skeletonPose.JointLabels.neckAngle));
             filledPose.jointFromName.Add(filledPose.Names[14], Convert.ToInt32(skeletonPose.JointLabels.centerShoulderAngle));
-            filledPose.jointFromName.Add(filledPose.Names[15], Convert.ToInt32(skeletonPose.JointLabels.numJoints));
+            //filledPose.jointFromName.Add(filledPose.Names[15], Convert.ToInt32(skeletonPose.JointLabels.numJoints));
 
             return filledPose;
         }
@@ -880,18 +884,27 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         /// <returns>N/A</returns>
         private void writePoseToFile(skeletonPose p)
         {
-            OpenFileDialog openFile = new OpenFileDialog();
+            // Open file dialog to pick a save location
+            SaveFileDialog saveFileDiag = new SaveFileDialog();
+            saveFileDiag.Title = "Save your Pose file";
+            saveFileDiag.Filter = "Text File (*.txt)";
+            if (saveFileDiag.ShowDialog() == DialogResult.OK)
+            {
+
+            }
+
+            // Save fileName path as a string
+            String filePath = saveFileDiag.FileName;
+
+            // Create a stream writer to write to a new file
+            StreamWriter streamWriter = new StreamWriter(filePath);
 
 
-            StreamWriter streamWriter = new StreamWriter;
             // Increase the poses captured counter
             numPosesCaptured++;
 
-            // Creating an array that will hold the converted toString angles
-            String[] strAngles = new String[15];
-
             // String that will hold the concatenated angles as a string in display in a pop-up
-            String promptAngles = "";
+            //String promptAngles = "";
 
             // Converting the angles to strings for writting to the external txt file
             for (int i = 0; i < p.Joints.Length; i++)
@@ -899,15 +912,11 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                 // streamWriter.writeLine(p.Names[i] + " " + Convert.ToString(p.Joints[i]) + " 15");   // when we have a tolerance, we wouldn't have 15 here as a default string
                 
                 
-                strAngles[i] = Convert.ToString(p.Joints[i]) + "\n";  //turn an index back into a name
-                promptAngles += i + ": " + Convert.ToString(p.Joints[i]) + "\n";
-            }
 
-            // Creating a new path/name for each new pose
-            String poseFolderPath = POSES_FOLDER_PATH + numPosesCaptured + ".txt";
-            
-            // Write out the string angles to the text file
-            System.IO.File.WriteAllLines(poseFolderPath, strAngles);
+
+                //strAngles[i] = Convert.ToString(p.Joints[i]) + "\n";  //turn an index back into a name
+                //promptAngles += i + ": " + Convert.ToString(p.Joints[i]) + "\n";
+            }
 
         }
 
