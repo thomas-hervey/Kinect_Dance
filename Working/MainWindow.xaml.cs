@@ -888,10 +888,10 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             SaveFileDialog saveFileDiag = new SaveFileDialog();
             saveFileDiag.Title = "Save your Pose file";
             saveFileDiag.Filter = "Text File (*.txt)";
-            if (saveFileDiag.ShowDialog() == DialogResult.OK)
+            /*if (saveFileDiag.ShowDialog() == DialogResult.OK)
             {
 
-            }
+            }*/
 
             // Save fileName path as a string
             String filePath = saveFileDiag.FileName;

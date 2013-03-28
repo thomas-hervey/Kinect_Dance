@@ -35,18 +35,23 @@ namespace DmxComm
             packet = new byte[DMX_PACKET_SIZE];
             for (int i = 0; i < DMX_PACKET_SIZE; i++)
             {
-                packet[i] = 0;
+                packet[i] = 111;
             }
             //turn off bit bang mode
-            device.SetBitMode(0x00, 0);
-            device.ResetDevice();
-            device.Purge(FTDI.FT_PURGE.FT_PURGE_RX | FTDI.FT_PURGE.FT_PURGE_TX);
-            device.SetBaudRate(9600);
-            device.SetTimeouts(1000, 1000);
-            device.SetDataCharacteristics(FTDI.FT_DATA_BITS.FT_BITS_8, FTDI.FT_STOP_BITS.FT_STOP_BITS_1, FTDI.FT_PARITY.FT_PARITY_NONE);
-            device.SetFlowControl(FTDI.FT_FLOW_CONTROL.FT_FLOW_NONE, 0, 0);
-            device.SetLatency(2);
+            //device.SetBitMode(0x00, 0);
+            //device.ResetDevice();
+           // device.Purge(FTDI.FT_PURGE.FT_PURGE_RX | FTDI.FT_PURGE.FT_PURGE_TX);
+            //device.SetBaudRate(250000);
+            //device.SetTimeouts(1000, 1000);
+            //device.SetDataCharacteristics(FTDI.FT_DATA_BITS.FT_BITS_8, FTDI.FT_STOP_BITS.FT_STOP_BITS_2, FTDI.FT_PARITY.FT_PARITY_NONE);
+            //device.SetFlowControl(FTDI.FT_FLOW_CONTROL.FT_FLOW_NONE, 0, 0);
+            //device.SetLatency(2);
 
+                for (int j = 0; j < 513; j++)
+                {
+                    packet[j] = (byte)22;
+                }
+                this.sendData();
 
         }
 
@@ -61,29 +66,38 @@ namespace DmxComm
         }
         public void sendData()
         {
+            //device.SetBreak(false);
+            //System.Threading.Thread.Sleep(40);
+            //device.SetBreak(true);
             if (packet.Length != 513)
             {
                 return;
             }
             uint written = 0;
+            FTDI.FT_STATUS result;
+            
             byte[] header = new byte[4];
             header[0] = 0x7E; //start code
             header[1] = 6; //DMX TX
             header[2] = 255 & 0xFF; //pack length logical and with max packet size
             header[3] = 255 >> 8; //packet length shifted by byte length? DMX standard idk
            
-            FTDI.FT_STATUS result;
+          
             result = device.Write(header, 4, ref written);//send dmx header
+          
             Console.WriteLine(result);
             Console.WriteLine(written);
            
+            
             result = device.Write(packet, 513, ref written);//send data array
             Console.WriteLine(result);
             Console.WriteLine(written);
             
+            
             byte[] endcode = new byte[1];
             endcode[0] = 0xE7;
             device.Write(endcode, 1, ref written);//send dmx end code
+             
         }
 
 
