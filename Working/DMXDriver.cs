@@ -4,13 +4,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using FTD2XX_NET;
-using System.Runtime.InteropServices; 
+using System.Runtime.InteropServices;
+using System.Threading;
 
 namespace DmxComm
 {
     class DmxDriver
     {
-        const int DMX_PACKET_SIZE = 513;
+        const int DMX_PACKET_SIZE = 165;
         private bool connected;
         private FTDI device;
         private int startAddr;
@@ -33,25 +34,7 @@ namespace DmxComm
             }
 
             packet = new byte[DMX_PACKET_SIZE];
-            for (int i = 0; i < DMX_PACKET_SIZE; i++)
-            {
-                packet[i] = 111;
-            }
-            //turn off bit bang mode
-            //device.SetBitMode(0x00, 0);
-            //device.ResetDevice();
-           // device.Purge(FTDI.FT_PURGE.FT_PURGE_RX | FTDI.FT_PURGE.FT_PURGE_TX);
-            //device.SetBaudRate(250000);
-            //device.SetTimeouts(1000, 1000);
-            //device.SetDataCharacteristics(FTDI.FT_DATA_BITS.FT_BITS_8, FTDI.FT_STOP_BITS.FT_STOP_BITS_2, FTDI.FT_PARITY.FT_PARITY_NONE);
-            //device.SetFlowControl(FTDI.FT_FLOW_CONTROL.FT_FLOW_NONE, 0, 0);
-            //device.SetLatency(2);
-
-                for (int j = 0; j < 513; j++)
-                {
-                    packet[j] = (byte)22;
-                }
-                this.sendData();
+            
 
         }
 
@@ -99,7 +82,40 @@ namespace DmxComm
             device.Write(endcode, 1, ref written);//send dmx end code
              
         }
+        
+        private void init(){
+            device.ResetDevice();
+            device.SetBaudRate(256000);
+            device.SetDataCharacteristics(FTDI.FT_DATA_BITS.FT_BITS_8,
+                FTDI.FT_STOP_BITS.FT_STOP_BITS_2, 
+                FTDI.FT_PARITY.FT_PARITY_NONE);
+            device.SetFlowControl(FTDI.FT_FLOW_CONTROL.FT_FLOW_NONE, 0, 0);
+            device.SetRTS(false);
+            device.Purge(FTDI.FT_PURGE.FT_PURGE_TX);
+            device.Purge(FTDI.FT_PURGE.FT_PURGE_RX);
+            packet[0] = 0;
+            packet[1] = 64;
+            packet[2] = 64;
+            packet[3] = 0;
 
+            Thread thread = new Thread(() => writeDataThread(device, packet));
+            thread.Start();
+        }
+
+        private static void writeDataThread(FTDI device, byte[] dataref){
+            bool done = false;
+            uint lngBytesWritten=0;
+
+            while (!done)
+            {
+                device.SetBreak(true);
+                device.SetBreak(false);
+                dataref[0] = 0;
+                device.Write(dataref, dataref.Length,ref lngBytesWritten);
+                System.Threading.Thread.Sleep(50);
+            }
+
+        }
 
         
 
