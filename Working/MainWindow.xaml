@@ -54,19 +54,82 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
-        <DockPanel Grid.Row="0" Margin="0 0 0 20">
+        <DockPanel Grid.Row="0" Margin="0,0,55,20">
             <Image DockPanel.Dock="Left" Source="Images\Logo.png" Stretch="None" Margin="0 10 0 5"/>
             <TextBlock DockPanel.Dock="Right" Margin="0 0 -1 0" VerticalAlignment="Bottom" Foreground="{StaticResource MediumGreyBrush}" FontFamily="Segoe UI" FontSize="18"><Run Text="Skeleton Basics"/></TextBlock>
-            <Image Grid.Column="1" Source="Images\Status.png" Stretch="None" HorizontalAlignment="Center" Margin="0 0 0 5"/>
+            <Image Grid.Column="1" Source="Images\Status.png" Stretch="None" HorizontalAlignment="Center" Margin="0 0 0 5" RenderTransformOrigin="0.467,0.57"/>
         </DockPanel>
+        
         <!-- User Added GUI -->
-        <TextBlock x:Name= "txtNumbers" Background="Cyan" FontSize="10" Margin="121,0,0,0"><InlineUIContainer>
-        		<Button x:Name="capturePose" Height="23" Width="61" Content="Capture" Visibility="Visible" Click="CapturePose" Cursor="Hand" />
-        	</InlineUIContainer><Run Text=" "/><InlineUIContainer>
-        		<Button x:Name="loadPose" Height="24" Width="67" Content="Load" Visibility="Visible" Click="LoadPose" Cursor="Hand" RenderTransformOrigin="0.5,0.5" />
+        <TextBlock x:Name= "txtNumbers" Background="#FF21A2A2" FontSize="10" Margin="121,0,0,0" Height="67" VerticalAlignment="Top"><InlineUIContainer>
+        		<Button x:Name="writePose" Height="24" Width="60" Content="Write" Visibility="Visible" Click="WritePose" Cursor="Hand" RenderTransformOrigin="0.5,0.5" >
+        			<Button.Effect>
+        				<DropShadowEffect ShadowDepth="2"/>
+        			</Button.Effect>
+        			<Button.RenderTransform>
+        				<TransformGroup>
+        					<ScaleTransform/>
+        					<SkewTransform/>
+        					<RotateTransform/>
+        					<TranslateTransform X="6" Y="5"/>
+        				</TransformGroup>
+        			</Button.RenderTransform>
+        		</Button>
         	</InlineUIContainer><InlineUIContainer>
-        		<TextBlock x:Name="txtCapturedInfo" Background="BurlyWood" Width= "293" Height="81" RenderTransformOrigin="0.628,0.34"/>
+        		<Button x:Name="loadPose" Height="24" Width="61" Content="Load" Visibility="Visible" Click="LoadPose" Cursor="Hand" RenderTransformOrigin="0.5,0.5" >
+        			<Button.Effect>
+        				<DropShadowEffect ShadowDepth="2"/>
+        			</Button.Effect>
+        			<Button.RenderTransform>
+        				<TransformGroup>
+        					<ScaleTransform/>
+        					<SkewTransform/>
+        					<RotateTransform/>
+        					<TranslateTransform X="-55" Y="35"/>
+        				</TransformGroup>
+        			</Button.RenderTransform>
+        		</Button>
+        	</InlineUIContainer><Run Text=" "/><InlineUIContainer>
+        		<TextBlock x:Name="txtCapturedInfo" Background="#FFFFDAAA" Width= "362" Height="62" RenderTransformOrigin="0.628,0.34" ScrollViewer.HorizontalScrollBarVisibility="Visible" ScrollViewer.VerticalScrollBarVisibility="Visible" ScrollViewer.CanContentScroll="True">
+                    <TextBlock.Effect>
+                        <DropShadowEffect ShadowDepth="2"/>
+                    </TextBlock.Effect>
+                    <TextBlock.RenderTransform>
+                        <TransformGroup>
+                            <ScaleTransform/>
+                            <SkewTransform/>
+                            <RotateTransform/>
+                            <TranslateTransform X="-40" Y="-10"/>
+                        </TransformGroup>
+                    </TextBlock.RenderTransform>
+        		</TextBlock>
         	</InlineUIContainer></TextBlock>
+        <GroupBox x:Name="functionMode" Header="Function Mode" Margin="573,0,38,3" FontWeight="Bold">
+            <WrapPanel HorizontalAlignment="Left" Height="42" VerticalAlignment="Top" Width="96" Margin="0,0,-2,0">
+                <RadioButton x:Name="captureMode" Content="Capture Mode" Checked="captureMode_Checked" Height="18" Width="96" IsChecked="True" Cursor="Hand" RenderTransformOrigin="0.5,0.5" FontWeight="Normal">
+                    <RadioButton.RenderTransform>
+                        <TransformGroup>
+                            <ScaleTransform/>
+                            <SkewTransform/>
+                            <RotateTransform/>
+                            <TranslateTransform Y="4"/>
+                        </TransformGroup>
+                    </RadioButton.RenderTransform>
+                </RadioButton>
+                <RadioButton x:Name="liveMode" Content="Live Mode" Checked="liveMode_Checked" Cursor="Hand" Height="16" RenderTransformOrigin="0.5,0.5" FontWeight="Normal">
+                    <RadioButton.RenderTransform>
+                        <TransformGroup>
+                            <ScaleTransform/>
+                            <SkewTransform/>
+                            <RotateTransform/>
+                            <TranslateTransform Y="7"/>
+                        </TransformGroup>
+                    </RadioButton.RenderTransform>
+                </RadioButton>
+            </WrapPanel>
+        </GroupBox>
+        <!-- End of user added GUI -->
+        
         <Viewbox Grid.Row="1" Stretch="Uniform" HorizontalAlignment="Center">
             <Image x:Name="Image" Width="640" Height="432"/>
         </Viewbox>
