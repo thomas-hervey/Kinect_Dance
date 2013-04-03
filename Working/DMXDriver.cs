@@ -4,14 +4,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using FTD2XX_NET;
-using System.Runtime.InteropServices;
-using System.Threading;
+using System.Runtime.InteropServices; 
 
 namespace DmxComm
 {
     class DmxDriver
     {
-        const int DMX_PACKET_SIZE = 165;
+        const int DMX_PACKET_SIZE = 513;
         private bool connected;
         private FTDI device;
         private int startAddr;
@@ -34,7 +33,22 @@ namespace DmxComm
             }
 
             packet = new byte[DMX_PACKET_SIZE];
-            
+            for (int i = 0; i < DMX_PACKET_SIZE; i++)
+            {
+                packet[i] = 0;
+            }
+            this.sendData();
+
+
+            //turn off bit bang mode
+            //device.SetBitMode(0x00, 0);
+            //device.ResetDevice();
+           // device.Purge(FTDI.FT_PURGE.FT_PURGE_RX | FTDI.FT_PURGE.FT_PURGE_TX);
+            //device.SetBaudRate(250000);
+            //device.SetTimeouts(1000, 1000);
+            //device.SetDataCharacteristics(FTDI.FT_DATA_BITS.FT_BITS_8, FTDI.FT_STOP_BITS.FT_STOP_BITS_2, FTDI.FT_PARITY.FT_PARITY_NONE);
+            //device.SetFlowControl(FTDI.FT_FLOW_CONTROL.FT_FLOW_NONE, 0, 0);
+            //device.SetLatency(2);
 
         }
 
@@ -52,10 +66,7 @@ namespace DmxComm
             //device.SetBreak(false);
             //System.Threading.Thread.Sleep(40);
             //device.SetBreak(true);
-            if (packet.Length != 513)
-            {
-                return;
-            }
+            
             uint written = 0;
             FTDI.FT_STATUS result;
             
@@ -63,16 +74,16 @@ namespace DmxComm
             header[0] = 0x7E; //start code
             header[1] = 6; //DMX TX
             header[2] = 255 & 0xFF; //pack length logical and with max packet size
-            header[3] = 255 >> 8; //packet length shifted by byte length? DMX standard idk
+            header[3] = (255 >> 8) & 0xFF; //packet length shifted by byte length? DMX standard idk
            
           
             result = device.Write(header, 4, ref written);//send dmx header
           
             Console.WriteLine(result);
             Console.WriteLine(written);
-           
-            
-            result = device.Write(packet, 513, ref written);//send data array
+
+            packet[0] = 0; 
+            result = device.Write(packet, 255, ref written);//send data array
             Console.WriteLine(result);
             Console.WriteLine(written);
             
@@ -82,40 +93,7 @@ namespace DmxComm
             device.Write(endcode, 1, ref written);//send dmx end code
              
         }
-        
-        private void init(){
-            device.ResetDevice();
-            device.SetBaudRate(256000);
-            device.SetDataCharacteristics(FTDI.FT_DATA_BITS.FT_BITS_8,
-                FTDI.FT_STOP_BITS.FT_STOP_BITS_2, 
-                FTDI.FT_PARITY.FT_PARITY_NONE);
-            device.SetFlowControl(FTDI.FT_FLOW_CONTROL.FT_FLOW_NONE, 0, 0);
-            device.SetRTS(false);
-            device.Purge(FTDI.FT_PURGE.FT_PURGE_TX);
-            device.Purge(FTDI.FT_PURGE.FT_PURGE_RX);
-            packet[0] = 0;
-            packet[1] = 64;
-            packet[2] = 64;
-            packet[3] = 0;
 
-            Thread thread = new Thread(() => writeDataThread(device, packet));
-            thread.Start();
-        }
-
-        private static void writeDataThread(FTDI device, byte[] dataref){
-            bool done = false;
-            uint lngBytesWritten=0;
-
-            while (!done)
-            {
-                device.SetBreak(true);
-                device.SetBreak(false);
-                dataref[0] = 0;
-                device.Write(dataref, dataref.Length,ref lngBytesWritten);
-                System.Threading.Thread.Sleep(50);
-            }
-
-        }
 
         
 
