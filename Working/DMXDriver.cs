@@ -35,8 +35,11 @@ namespace DmxComm
             packet = new byte[DMX_PACKET_SIZE];
             for (int i = 0; i < DMX_PACKET_SIZE; i++)
             {
-                packet[i] = 111;
+                packet[i] = 0;
             }
+            this.sendData();
+
+
             //turn off bit bang mode
             //device.SetBitMode(0x00, 0);
             //device.ResetDevice();
@@ -46,12 +49,6 @@ namespace DmxComm
             //device.SetDataCharacteristics(FTDI.FT_DATA_BITS.FT_BITS_8, FTDI.FT_STOP_BITS.FT_STOP_BITS_2, FTDI.FT_PARITY.FT_PARITY_NONE);
             //device.SetFlowControl(FTDI.FT_FLOW_CONTROL.FT_FLOW_NONE, 0, 0);
             //device.SetLatency(2);
-
-                for (int j = 0; j < 513; j++)
-                {
-                    packet[j] = (byte)22;
-                }
-                this.sendData();
 
         }
 
@@ -69,10 +66,7 @@ namespace DmxComm
             //device.SetBreak(false);
             //System.Threading.Thread.Sleep(40);
             //device.SetBreak(true);
-            if (packet.Length != 513)
-            {
-                return;
-            }
+            
             uint written = 0;
             FTDI.FT_STATUS result;
             
@@ -80,16 +74,16 @@ namespace DmxComm
             header[0] = 0x7E; //start code
             header[1] = 6; //DMX TX
             header[2] = 255 & 0xFF; //pack length logical and with max packet size
-            header[3] = 255 >> 8; //packet length shifted by byte length? DMX standard idk
+            header[3] = (255 >> 8) & 0xFF; //packet length shifted by byte length? DMX standard idk
            
           
             result = device.Write(header, 4, ref written);//send dmx header
           
             Console.WriteLine(result);
             Console.WriteLine(written);
-           
-            
-            result = device.Write(packet, 513, ref written);//send data array
+
+            packet[0] = 0; 
+            result = device.Write(packet, 255, ref written);//send data array
             Console.WriteLine(result);
             Console.WriteLine(written);
             
