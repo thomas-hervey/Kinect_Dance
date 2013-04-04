@@ -42,7 +42,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         private Boolean isLiveMode = false;
 
 
-
+        int tempc = 0;
 
         /* Saving pose variables */
         
@@ -356,16 +356,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                             // Constantly assigning the currentStreamPose variable to the current stream data (entailing joint angles and joint names)
                             currentStreamPose = getPose(skel);
 
-
-
-                            //// NON-FILE LIGHTING EFFECT TEST FUNCTION
-                            //if (currentStreamPose.Joints[1] > 70 && currentStreamPose.Joints[1] < 110)
-                            //{
-                            //    txtCapturedInfo.Text = "YAY POSE";
-                            //    doTestFunction();
-                            //}
-
-                            // If the user is in capture modeL Don't allow pose checking or lighting effects
+                            // If the user is in capture mode Don't allow pose checking or lighting effects
                             if (isLiveMode == false)
                             {
                                 txtCapturedInfo.Text = "In capture mode";
@@ -388,10 +379,15 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                                     //check to see which function we want to do
                                     //set the whole timer situation up
                                 }
-                            }  
-                     
-                         
+                            }
 
+
+                            //// NON-FILE LIGHTING EFFECT TEST FUNCTION
+                            //if (currentStreamPose.Joints[1] > 70 && currentStreamPose.Joints[1] < 110)
+                            //{
+                            //    txtCapturedInfo.Text = "YAY POSE";
+                            //    doTestFunction();
+                            //}
 
 
 
@@ -575,7 +571,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 
         /* *****MODE SELECTION FUNCTIONS***** */
 
-
+        
         /// <summary>
         /// Radio button function to select capture mode (instead of live performance mode)
         /// </summary>
@@ -598,7 +594,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             // If there aren't any poses in our array, don't set up live mode yet
             if (poseArrayList.Count == 0)
             {
-                txtCapturedInfo.Text = "There are no saved poses yet. \n Cannot start live mode.";
+                txtCapturedInfo.Text = "There are no saved poses yet. Cannot start live mode.";
                 isLiveMode = false;
             }
             else
@@ -797,10 +793,16 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         {
             // Open file dialog to get the pose text to open
             OpenFileDialog openFile = new OpenFileDialog();
-            openFile.ShowDialog();
-            // Save fileName path as a string
-            String filePath = openFile.FileName;
-
+            DialogResult result = openFile.ShowDialog();
+            String filePath = "";
+            filePath = openFile.FileName;
+            //if (DialogResult.HasValue)
+            //{
+            //    // Save fileName path as a string
+            //    filePath = openFile.FileName;
+            //}
+            
+            
             // Create a stream reader to read from the newly opened file
             StreamReader streamReader = new StreamReader(filePath);
 
@@ -1121,7 +1123,14 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             // Save off the matching saved pose from poseArray globally
             matchedSavedPose = (skeletonPose)poseArrayList[matchingPoseArrayIndex];
 
-            // do something else.... do we call effect functions here or higher up?
+            if (matchingPoseArrayIndex == 0)
+            { doTestFunction(); }
+            else if (matchingPoseArrayIndex == 1)
+            {
+                doTestFunction2();
+            }
+
+         
         }
 
 
@@ -1153,11 +1162,33 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         /// <returns> N/A </returns>
         private void doTestFunction()
         {
+            Console.WriteLine("DO TEST FUNCTION");
+            tempc += 1;
             dmxdev.setLampOn();
-            dmxdev.setDimmerLevel(255);
-            dmxdev.setPan(0);
-            dmxdev.setTilt(-120);
-            //dmxdev.sendData();
+            dmxdev.setDimmerLevel((byte)(tempc & 0xff));
+            dmxdev.setPan((byte)((tempc % 255) - 128));
+            dmxdev.setTilt((byte)((tempc % 255) - 128));
+            dmxdev.setColorContinuous(DmxDriver.color_t.PINK);
+            dmxdev.sendData();
+        }
+
+        /// <summary>
+        /// Checks to see if the light will have a result: TEST FUNCTION
+        /// </summary>
+        /// <param name="capturedPose"></param>
+        /// <param name="currentSkel"></param>
+        /// <returns> N/A </returns>
+        private void doTestFunction2()
+        {
+            Console.WriteLine("DO TEST FUNCTION2");
+            tempc -= 1;
+            dmxdev.setLampOn();
+            dmxdev.setDimmerLevel((byte)(tempc & 0xff));
+            dmxdev.setPan((byte)((tempc % 255) - 128));
+            dmxdev.setTilt((byte)((tempc % 255) - 128));
+            dmxdev.setColorContinuous(DmxDriver.color_t.BLUE_101);
+            dmxdev.setGoboStandard(3);
+            dmxdev.sendData();
         }
 
 
