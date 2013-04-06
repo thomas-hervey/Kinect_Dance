@@ -62,18 +62,18 @@
         
         <!-- User Added GUI -->
         <TextBlock x:Name= "txtNumbers" Background="#FF21A2A2" FontSize="10" Margin="121,0,0,0" Height="67" VerticalAlignment="Top"><InlineUIContainer>
-        		<Button x:Name="writePose" Height="24" Width="60" Content="Write" Visibility="Visible" Click="WritePose" Cursor="Hand" RenderTransformOrigin="0.5,0.5" >
-        			<Button.Effect>
-        				<DropShadowEffect ShadowDepth="2"/>
-        			</Button.Effect>
+        		<Button x:Name="capturePose" Height="24" Width="60" Content="Capture" Visibility="Visible" Click="CapturePose" Cursor="Hand" RenderTransformOrigin="0.5,0.5" Margin="0,24,0,0" >
         			<Button.RenderTransform>
         				<TransformGroup>
         					<ScaleTransform/>
         					<SkewTransform/>
         					<RotateTransform/>
-        					<TranslateTransform X="6" Y="5"/>
+        					<TranslateTransform Y="-35" X="5"/>
         				</TransformGroup>
         			</Button.RenderTransform>
+        			<Button.Effect>
+        				<DropShadowEffect ShadowDepth="2"/>
+        			</Button.Effect>
         		</Button>
         	</InlineUIContainer><InlineUIContainer>
         		<Button x:Name="loadPose" Height="24" Width="61" Content="Load" Visibility="Visible" Click="LoadPose" Cursor="Hand" RenderTransformOrigin="0.5,0.5" >
@@ -85,24 +85,23 @@
         					<ScaleTransform/>
         					<SkewTransform/>
         					<RotateTransform/>
-        					<TranslateTransform X="-55" Y="35"/>
+        					<TranslateTransform X="-55" Y="-5"/>
         				</TransformGroup>
         			</Button.RenderTransform>
         		</Button>
         	</InlineUIContainer><Run Text=" "/><InlineUIContainer>
-        		<TextBlock x:Name="txtCapturedInfo" Background="#FFFFDAAA" Width= "362" Height="62" RenderTransformOrigin="0.628,0.34" ScrollViewer.HorizontalScrollBarVisibility="Visible" ScrollViewer.VerticalScrollBarVisibility="Visible" ScrollViewer.CanContentScroll="True">
-                    <TextBlock.Effect>
+        		<TextBox x:Name="txtCapturedInfo" Background="#FFFFDAAA" Width= "362" Height="65" RenderTransformOrigin="0.628,0.34" ScrollViewer.VerticalScrollBarVisibility="Visible" ScrollViewer.CanContentScroll="True" Margin="0">
+                    <TextBox.Effect>
                         <DropShadowEffect ShadowDepth="2"/>
-                    </TextBlock.Effect>
-                    <TextBlock.RenderTransform>
+                    </TextBox.Effect>
+                    <TextBox.RenderTransform>
                         <TransformGroup>
                             <ScaleTransform/>
                             <SkewTransform/>
                             <RotateTransform/>
-                            <TranslateTransform X="-40" Y="-10"/>
+                            <TranslateTransform X="-40"/>
                         </TransformGroup>
-                    </TextBlock.RenderTransform>
-        		</TextBlock>
+                    </TextBox.RenderTransform></TextBox>
         	</InlineUIContainer></TextBlock>
         <GroupBox x:Name="functionMode" Header="Function Mode" Margin="573,0,38,3" FontWeight="Bold">
             <WrapPanel HorizontalAlignment="Left" Height="42" VerticalAlignment="Top" Width="96" Margin="0,0,-2,0">
