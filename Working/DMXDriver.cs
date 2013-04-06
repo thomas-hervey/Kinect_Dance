@@ -123,7 +123,7 @@ public void setColorContinuous(color_t c){
 		}
 }
 
-public enum speed_t {FAST = 248, MEDIUM = 251, SLOW = 255};
+public enum speed_t {FAST = 246, MEDIUM = 251, SLOW = 255};
 
 public void setRandomColors( speed_t speed){
 	int COLOR_CHANNEL = 3;
@@ -178,7 +178,7 @@ const int GOBO_CHANNEL = 4;
 public void setGoboStandard( int goboVal){
 	byte[] dmxGoboVals = new byte[] {19,29,39,49,59,69,79,85};
 	
-	if(goboVal <= GOBO_COUNT && goboVal >= 0){
+	if(goboVal <= GOBO_COUNT && goboVal > 0){
 		packet[startAddr + GOBO_CHANNEL - 1] = dmxGoboVals[goboVal - 1];
 	}
 }
