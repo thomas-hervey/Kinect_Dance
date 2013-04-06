@@ -47,7 +47,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         // writePose counter
         private int numPosesWritten = 0;
         // List of joint tolerances from our joint selection window
-        public double[] jointTolerances = new double[15];
+        public double[] jointTolerances = new double[14];
 
 
         /* Loading pose variables */
@@ -751,12 +751,11 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         /// Function that opens up the joints to check window
         /// </summary>
         /// <returns> N/A </returns>
-        public void CapturePose(object sender, RoutedEventArgs e)
+        private void CapturePose(object sender, RoutedEventArgs e)
         {
             // Open up the joint selection window
             JSF jointSelectionForm = new JSF();
             jointSelectionForm.Show();
-            //savePose();
         }
 
         /// <summary>
@@ -782,7 +781,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                 // For all of our joints, write out the joint name, angle and tolerance to a line
                 for (int i = 0; i < capturedPose.Joints.Length; i++)
                 {
-                    streamWriter.WriteLine(capturedPose.Names[i] + " " + Convert.ToString(capturedPose.Joints[i]) + " " + jointTolerances[i]);   
+                    streamWriter.WriteLine(capturedPose.Names[i] + " " + Convert.ToString(capturedPose.Joints[i]) + " 15");   // when we have a tolerance, we wouldn't have 15 here as a default string
                 }
                 streamWriter.Close();
             }
@@ -814,6 +813,12 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             //    // Save fileName path as a string
             //    filePath = openFile.FileName;
             //}
+
+
+            if (!Directory.Exists(filePath))
+            {
+                return;
+            }
             
             
             // Create a stream reader to read from the newly opened file
@@ -836,9 +841,6 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                 poseToFill.Joints[whichJoint] = Convert.ToDouble(words[ANGLE_INDEX]);          // joint angle = second word
                 poseToFill.Tolerance[whichJoint] = Convert.ToDouble(words[TOLERANCE_INDEX]);   // joint tolerance = third word
             }
-            // Set the effectName to the user's chosen effect
-            //poseToFill.effectName = effectName;
-
             // TEST OUTPUT:  txtCapturedInfo.Text = Convert.ToString(poseToFill.Joints[1]);
 
             // Place the newly filled pose into the poseArray
@@ -849,12 +851,27 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             streamReader.Close();
             openFile.Dispose();
 
+            skeletonPose loadedTest = (skeletonPose)poseArrayList[0];
 
-            // tests
-
-            //skeletonPose loadedTest = (skeletonPose)poseArrayList[0];
-            txtCapturedInfo.Text = "Pose added to index: " + poseArrayList.Count; //loadedTest.Names[3] + " " + loadedTest.Joints[4] + " " + loadedTest.Tolerance[3];
+            txtCapturedInfo.Text = loadedTest.Names[3] + " " + loadedTest.Joints[4] + " " + loadedTest.Tolerance[3];
         }
+
+        /*
+        /// <summary>
+        /// ONLOAD function that checks if there are poses already saved
+        /// </summary>
+        /// <returns>containsPoseFiles: Boolean if there are poses already saved</returns>
+        private Boolean containsPoseFiles()
+        {
+            Boolean containsPoseFiles = false;
+            //Check to see if ".../Pose#_1.txt" exists
+            if(File.Exists(POSES_FOLDER_PATH + "1.txt"))
+            {
+                containsPoseFiles = true;
+            }
+            return containsPoseFiles;
+        }
+        */
 
 
 
@@ -1123,7 +1140,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         {
             // Save off the matching saved pose from poseArray globally
             matchedSavedPose = (skeletonPose)poseArrayList[matchingPoseArrayIndex];
-            
+
             if (matchingPoseArrayIndex == 0)
             { doTestFunction(); }
             else if (matchingPoseArrayIndex == 1)
