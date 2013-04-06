@@ -11,6 +11,9 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 {
     public partial class JSF : Form
     {
+        //varibale to check if form exited with safe
+        public bool save = false;
+        public double[] jointTolerances = new double[15];
         public JSF()
         {
             InitializeComponent();
@@ -82,7 +85,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             int TOLERANCE_TERMINAL = -77;
             
             // Group item counter
-            int i = 0;
+            int i = 14;
             
             // Fill MainWindow's array of jointTolerances with the checked options
             foreach (Control t in jointSelectionGroup.Controls)
@@ -91,18 +94,18 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                 {
                     if (((TextBox)t).Enabled == true)
                     {
-                        kinectWindow.jointTolerances[i] = Convert.ToDouble(t.Text);
+                        this.jointTolerances[i] = Convert.ToDouble(t.Text);
                     }
                     else
                     {
-                        kinectWindow.jointTolerances[i] = TOLERANCE_TERMINAL;
+                        this.jointTolerances[i] = TOLERANCE_TERMINAL;
                     }
                 }
-                i ++;
+                i --;
             }
-            
-            // Save the pose
-            kinectWindow.savePose();
+
+            save = true;
+            this.Close();   
         }
 
         /// <summary>

@@ -46,8 +46,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         
         // writePose counter
         private int numPosesWritten = 0;
-        // List of joint tolerances from our joint selection window
-        public double[] jointTolerances = new double[15];
+        
 
 
         /* Loading pose variables */
@@ -592,8 +591,12 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             // If there aren't any poses in our array, don't set up live mode yet
             if (poseArrayList.Count == 0)
             {
-                txtCapturedInfo.Text = "There are no saved poses yet. Cannot start live mode.";
+                txtCapturedInfo.Text = "There are no loaded poses yet. Cannot start live mode.";
                 isLiveMode = false;
+
+                // Change the radio buttons
+                liveMode.IsChecked = false;
+                captureMode.IsChecked = true;
             }
             else
             {
@@ -753,20 +756,30 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         /// <returns> N/A </returns>
         public void CapturePose(object sender, RoutedEventArgs e)
         {
+            // Save off a pose from the stream
+            skeletonPose capturedPose = currentStreamPose;
+
             // Open up the joint selection window
             JSF jointSelectionForm = new JSF();
-            jointSelectionForm.Show();
-            //savePose();
+            
+            // Call the joint selection form
+            jointSelectionForm.ShowDialog();
+            
+           
+
+            if(jointSelectionForm.save == true)
+            {
+                // Save the pose with the desired joints to check
+                savePose(capturedPose, jointSelectionForm.jointTolerances);
+            }
         }
 
         /// <summary>
         /// Once joints to check have been selected, write the pose to text
         /// </summary>
         /// <returns> N/A </returns>
-        public void savePose()
+        private void savePose(skeletonPose capturedPose, double[] jointTolerances)
         {
-            // Uses the saved off pose from the current stream
-            skeletonPose capturedPose = currentStreamPose;
 
             // Open file dialog to pick a save location
             SaveFileDialog saveFileDiag = new SaveFileDialog();
