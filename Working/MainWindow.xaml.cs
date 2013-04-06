@@ -34,8 +34,6 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         DmxDriver dmxdev = new DmxDriver(150);
 
 
-
-
         /* Mode selection variables */
 
         // Mode designation
@@ -48,8 +46,8 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         
         // writePose counter
         private int numPosesWritten = 0;
-
-
+        // List of joint tolerances from our joint selection window
+        public double[] jointTolerances = new double[14];
 
 
         /* Loading pose variables */
@@ -581,7 +579,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             // Setting the mode option to capture
             isLiveMode = false;
             // Enabling capture function buttons
-            writePose.IsEnabled = true;
+            capturePose.IsEnabled = true;
             loadPose.IsEnabled = true;
         }
 
@@ -602,7 +600,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                 // Setting the mode option to live
                 isLiveMode = true;
                 // Disabling capture function buttons
-                writePose.IsEnabled = false;
+                capturePose.IsEnabled = false;
                 loadPose.IsEnabled = false;
             }
         }
@@ -749,13 +747,29 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 
         //}
 
-        private void WritePose(object sender, RoutedEventArgs e)
+        /// <summary>
+        /// Function that opens up the joints to check window
+        /// </summary>
+        /// <returns> N/A </returns>
+        private void CapturePose(object sender, RoutedEventArgs e)
+        {
+            // Open up the joint selection window
+            JSF jointSelectionForm = new JSF();
+            jointSelectionForm.Show();
+        }
+
+        /// <summary>
+        /// Once joints to check have been selected, write the pose to text
+        /// </summary>
+        /// <returns> N/A </returns>
+        public void savePose()
         {
             // Uses the saved off pose from the current stream
             skeletonPose capturedPose = currentStreamPose;
 
             // Open file dialog to pick a save location
             SaveFileDialog saveFileDiag = new SaveFileDialog();
+
             // If the file dialog works...
             if (saveFileDiag.ShowDialog() == System.Windows.Forms.DialogResult.OK)
             {
@@ -776,8 +790,6 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             // Increase the pose written counter
             numPosesWritten++;
         }
-
-
 
 
 
