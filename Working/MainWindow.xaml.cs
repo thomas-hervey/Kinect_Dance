@@ -47,7 +47,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         // writePose counter
         private int numPosesWritten = 0;
         // List of joint tolerances from our joint selection window
-        public double[] jointTolerances = new double[14];
+        public double[] jointTolerances = new double[15];
 
 
         /* Loading pose variables */
@@ -808,18 +808,11 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             DialogResult result = openFile.ShowDialog();
             String filePath = "";
             filePath = openFile.FileName;
-            //if (DialogResult.HasValue)
-            //{
-            //    // Save fileName path as a string
-            //    filePath = openFile.FileName;
-            //}
-
-
+            // Cancel button handler
             if (!Directory.Exists(filePath))
             {
                 return;
             }
-            
             
             // Create a stream reader to read from the newly opened file
             StreamReader streamReader = new StreamReader(filePath);
