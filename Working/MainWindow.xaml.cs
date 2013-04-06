@@ -1169,7 +1169,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             dmxdev.setPan((byte)((tempc % 255) - 128));
             dmxdev.setTilt((byte)((tempc % 255) - 128));
             dmxdev.setColorContinuous(DmxDriver.color_t.PINK);
-            dmxdev.sendData();
+         
         }
 
         /// <summary>
@@ -1188,7 +1188,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             dmxdev.setTilt((byte)((tempc % 255) - 128));
             dmxdev.setColorContinuous(DmxDriver.color_t.BLUE_101);
             dmxdev.setGoboStandard(3);
-            dmxdev.sendData();
+            
         }
 
 
