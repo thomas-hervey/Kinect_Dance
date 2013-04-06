@@ -224,6 +224,7 @@
             this.rightWristText.Name = "rightWristText";
             this.rightWristText.Size = new System.Drawing.Size(48, 20);
             this.rightWristText.TabIndex = 20;
+            
             // 
             // btnDeselectAll
             // 
