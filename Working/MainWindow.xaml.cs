@@ -827,7 +827,9 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             //    // Save fileName path as a string
             //    filePath = openFile.FileName;
             //}
-            
+            if(!Directory.Exists(filePath)){
+                return;
+            }
             
             // Create a stream reader to read from the newly opened file
             StreamReader streamReader = new StreamReader(filePath);
