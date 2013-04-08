@@ -11,16 +11,24 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 {
     public partial class JSF : Form
     {
-        //varibale to check if form exited with safe
+        // Varibale to check if form exited with safe
         public bool save = false;
+        // Array to hold user's joint options
         public double[] jointTolerances = new double[15];
+
+
         public JSF()
         {
             InitializeComponent();
         }
 
+        /// <summary>
+        /// On load setup function
+        /// </summary>
+        /// <returns> N/A </returns>
         private void Form1_Load(object sender, EventArgs e)
         {
+            // On load, disable all group controls
             foreach (Control t in jointSelectionGroup.Controls)
             {
                 if (t is TextBox && t != null)
@@ -28,6 +36,8 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                     t.Enabled = false;
                 }
             }
+            // On load, populate the effect drop down menu
+            effectSelector.Items.Add(
         }
 
         /// <summary>
@@ -43,7 +53,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                 {
                     ((CheckBox)c).Checked = true;
                 }
-                // If the grou element is a text box, fill it with a 15 value default
+                // Fill textboxes with a 15 degree tolerance default
                 if (c is TextBox && c != null)
                 {
                     c.Text = "15";
@@ -65,7 +75,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                 {
                     ((CheckBox)c).Checked = false;
                 }
-                // If the group element is a text box, clear it of any values
+                //  Clear all textboxes of any values
                 if (c is TextBox && c != null)
                 {
                     ((TextBox)c).Clear();
@@ -80,8 +90,8 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         /// <returns> N/A </returns>
         private void savePose_Click(object sender, EventArgs e)
         {
-            // Declare a reference to the MainWindow
-            MainWindow kinectWindow = new MainWindow();
+
+            // Default for unimportant joints
             int TOLERANCE_TERMINAL = -77;
             
             // Group item counter
@@ -117,8 +127,10 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             this.Close();
         }
 
-
-        // Functions to grey out text boxes unless their corresponding box is checked
+        /// <summary>
+        /// Functions to enable/disable text boxes based on their corresponding check box
+        /// </summary>
+        /// <returns> N/A </returns>
         private void rightWristCheck_CheckedChanged(object sender, EventArgs e)
         {
             if (rightWristCheck.Checked)
@@ -301,6 +313,13 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             }
         }
 
-
+        /// <summary>
+        /// Handler for the effect selection drop down menu
+        /// </summary>
+        /// <returns> N/A </returns>
+        private void effectSelector_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            
+        }
     }
 }
