@@ -37,7 +37,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                 }
             }
             // On load, populate the effect drop down menu
-            effectSelector.Items.Add(
+            
         }
 
         /// <summary>
