@@ -68,6 +68,8 @@
             this.rightWristCheck = new System.Windows.Forms.CheckBox();
             this.btnCancelSave = new System.Windows.Forms.Button();
             this.btnSavePose = new System.Windows.Forms.Button();
+            this.effectSelector = new System.Windows.Forms.ComboBox();
+            this.effectSelectorLabel = new System.Windows.Forms.Label();
             this.jointSelectionGroup.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -224,7 +226,6 @@
             this.rightWristText.Name = "rightWristText";
             this.rightWristText.Size = new System.Drawing.Size(48, 20);
             this.rightWristText.TabIndex = 20;
-            
             // 
             // btnDeselectAll
             // 
@@ -463,7 +464,7 @@
             // 
             // btnCancelSave
             // 
-            this.btnCancelSave.Location = new System.Drawing.Point(668, 11);
+            this.btnCancelSave.Location = new System.Drawing.Point(668, 31);
             this.btnCancelSave.Name = "btnCancelSave";
             this.btnCancelSave.Size = new System.Drawing.Size(75, 30);
             this.btnCancelSave.TabIndex = 2;
@@ -473,7 +474,7 @@
             // 
             // btnSavePose
             // 
-            this.btnSavePose.Location = new System.Drawing.Point(587, 11);
+            this.btnSavePose.Location = new System.Drawing.Point(587, 31);
             this.btnSavePose.Name = "btnSavePose";
             this.btnSavePose.Size = new System.Drawing.Size(75, 30);
             this.btnSavePose.TabIndex = 3;
@@ -481,11 +482,32 @@
             this.btnSavePose.UseVisualStyleBackColor = true;
             this.btnSavePose.Click += new System.EventHandler(this.savePose_Click);
             // 
+            // effectSelector
+            // 
+            this.effectSelector.FormattingEnabled = true;
+            this.effectSelector.Location = new System.Drawing.Point(587, 137);
+            this.effectSelector.Name = "effectSelector";
+            this.effectSelector.Size = new System.Drawing.Size(156, 21);
+            this.effectSelector.TabIndex = 4;
+            this.effectSelector.SelectedIndexChanged += new System.EventHandler(this.effectSelector_SelectedIndexChanged);
+            // 
+            // effectSelectorLabel
+            // 
+            this.effectSelectorLabel.AutoSize = true;
+            this.effectSelectorLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.effectSelectorLabel.Location = new System.Drawing.Point(619, 117);
+            this.effectSelectorLabel.Name = "effectSelectorLabel";
+            this.effectSelectorLabel.Size = new System.Drawing.Size(90, 13);
+            this.effectSelectorLabel.TabIndex = 5;
+            this.effectSelectorLabel.Text = "Effect Choices";
+            // 
             // JSF
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(762, 482);
+            this.ClientSize = new System.Drawing.Size(755, 481);
+            this.Controls.Add(this.effectSelectorLabel);
+            this.Controls.Add(this.effectSelector);
             this.Controls.Add(this.btnSavePose);
             this.Controls.Add(this.btnCancelSave);
             this.Controls.Add(this.jointSelectionGroup);
@@ -495,6 +517,7 @@
             this.jointSelectionGroup.ResumeLayout(false);
             this.jointSelectionGroup.PerformLayout();
             this.ResumeLayout(false);
+            this.PerformLayout();
 
         }
 
@@ -540,5 +563,7 @@
         private System.Windows.Forms.TextBox rightShoulderText;
         private System.Windows.Forms.TextBox rightElbowText;
         private System.Windows.Forms.TextBox rightWristText;
+        private System.Windows.Forms.ComboBox effectSelector;
+        private System.Windows.Forms.Label effectSelectorLabel;
     }
 }
