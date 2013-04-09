@@ -32,7 +32,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 
         // Dmx Object
         DmxDriver dmxdev = new DmxDriver(150);
-
+        int tempc = 0;
 
         /* Mode selection variables */
 
@@ -40,7 +40,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         private Boolean isLiveMode = false;
 
 
-        int tempc = 0;
+
 
         /* Saving pose variables */
         
@@ -51,9 +51,9 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 
         /* Loading pose variables */
 
-        // skeletonPose array to hold 6 different poses captured before a live mode
+        // skeletonPose array to hold different poses captured before a live mode
         private ArrayList poseArrayList = new ArrayList();
-        // Constants for text loading
+        // Loading text constants
         private int NAME_INDEX = 0;
         private int ANGLE_INDEX = 1;
         private int TOLERANCE_INDEX = 2;
@@ -362,19 +362,18 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                             // If the user is in live mode: Allow pose checking & lighting effects
                             else if (isLiveMode == true)
                             {
+                                txtCapturedInfo.Text = "In live mode";
                                 // Compares if the currentStreamPose pose matches any of the saved poses in poseArray
                                 matchingPoseArrayIndex = poseChecker();
 
                                 // If one of the poses matches, activate its according dance performance function
                                 if (matchingPoseArrayIndex != -99)
                                 {
-                                    // Calls a static lighting functions overseer & structural handler, passing in the matched pose index
-                                    staticLightingHandler(matchingPoseArrayIndex);
                                     //Lets the user know which pose the program thinks is a match
                                     txtCapturedInfo.Text = "Matching Pose seen: " + matchingPoseArrayIndex;
 
-                                    //check to see which function we want to do
-                                    //set the whole timer situation up
+                                    // Passes the pose to the lighting handler
+                                    staticLightingHandler(matchingPoseArrayIndex);
                                 }
                             }
 
@@ -385,28 +384,6 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                             //    txtCapturedInfo.Text = "YAY POSE";
                             //    doTestFunction();
                             //}
-
-
-
-
-
-
-                     /*         isCurrentFGPose test function
-
-                            // check to see if the current Pose the kinect is looking at is relatively the same as the Pose CAPTURED_POSE
-                            if (isCurrentFGPose(poseArray[numPosesCaptured_LOCAL], skel))
-                            {
-                                // if it IS the same Pose, check to see if 10 seconds have elapsed 
-                                if (capturedTimeElapsed.Seconds > 10)
-                                {
-                                    txtCapturedInfo.Text = "SAME POSE (after 10)!! " + capturedTimeElapsed.Seconds.ToString();
-                                }
-                                else
-                                {
-                                    txtCapturedInfo.Text = "Same pose (before 10) " + capturedTimeElapsed.Seconds.ToString();
-                                }                                                                                                          
-                            }  
-                      */
 
                         }
 
@@ -764,12 +741,10 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             
             // Call the joint selection form
             jointSelectionForm.ShowDialog();
-            
-           
 
+            // Save the pose with the desired joints to check
             if(jointSelectionForm.save == true)
             {
-                // Save the pose with the desired joints to check
                 savePose(capturedPose, jointSelectionForm.jointTolerances);
             }
         }
@@ -808,6 +783,8 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 
 
 
+
+
         /* *****LOAD POSE FUNCTIONS***** */
 
 
@@ -822,12 +799,9 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             DialogResult result = openFile.ShowDialog();
             String filePath = "";
             filePath = openFile.FileName;
-            //if (DialogResult.HasValue)
-            //{
-            //    // Save fileName path as a string
-            //    filePath = openFile.FileName;
-            //}
-            if(!Directory.Exists(filePath)){
+
+            // Cancel button handler
+            if(!File.Exists(filePath)){
                 return;
             }
             
@@ -854,7 +828,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             // Set the effectName to the user's chosen effect
             //poseToFill.effectName = effectName;
 
-            // TEST OUTPUT:  txtCapturedInfo.Text = Convert.ToString(poseToFill.Joints[1]);
+            txtCapturedInfo.Text = Convert.ToString(poseToFill.Joints[1]);
 
             // Place the newly filled pose into the poseArray
             poseArrayList.Add(poseToFill);
@@ -1085,28 +1059,6 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             return isPoseMatch;
         }
 
-        // Likely to be removed later
-        ///// <summary>
-        ///// isCurrentPose helper method: 
-        ///// Checks to see if the current joint name from the external joints to check text file is in our array of joints
-        ///// </summary>
-        ///// <param name="jointsToCheck"></param>
-        ///// <param name="currentPose"></param>
-        ///// <returns>isInList: boolean value if the name is in the joints array</returns>
-        //private Boolean isJointInList(String[] jointsToCheck, skeletonPose currentPose)
-        //{
-        //    Boolean isInList = false;
-
-        //    for (int i = 0; i < jointsToCheck.Length; i++)
-        //    {
-        //        if (currentPose.jointFromName.ContainsKey(jointsToCheck[i]))
-        //        {
-        //            isInList = true;
-        //        }
-        //    }
-        //    return isInList;
-        //}
-
         /// <summary>
         /// isCurrentPose helper method: 
         /// Checks the validity if the current joint angle is within +- "tolerance" of the matching saved joint angle
@@ -1128,6 +1080,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 
 
         /* *****LIGHTING FUNCTIONS***** */
+
 
         /// <summary>
         /// Static lighting functions overseer & structural handler
@@ -1283,7 +1236,6 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 
             return Math.Sqrt(xValuesSqrd + yValuesSqrd) * 100;
         }
-
 
     }
 }

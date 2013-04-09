@@ -70,6 +70,7 @@
             this.btnSavePose = new System.Windows.Forms.Button();
             this.effectSelector = new System.Windows.Forms.ComboBox();
             this.effectSelectorLabel = new System.Windows.Forms.Label();
+            this.title = new System.Windows.Forms.Label();
             this.jointSelectionGroup.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -115,12 +116,11 @@
             this.jointSelectionGroup.Controls.Add(this.rightElbowCheck);
             this.jointSelectionGroup.Controls.Add(this.rightWristCheck);
             this.jointSelectionGroup.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.jointSelectionGroup.Location = new System.Drawing.Point(12, 12);
+            this.jointSelectionGroup.Location = new System.Drawing.Point(12, 34);
             this.jointSelectionGroup.Name = "jointSelectionGroup";
             this.jointSelectionGroup.Size = new System.Drawing.Size(567, 205);
             this.jointSelectionGroup.TabIndex = 0;
             this.jointSelectionGroup.TabStop = false;
-            this.jointSelectionGroup.Text = "Joint Selection";
             // 
             // centerShouldersText
             // 
@@ -501,18 +501,29 @@
             this.effectSelectorLabel.TabIndex = 5;
             this.effectSelectorLabel.Text = "Effect Choices";
             // 
+            // title
+            // 
+            this.title.AutoSize = true;
+            this.title.Font = new System.Drawing.Font("Microsoft Sans Serif", 12.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.title.Location = new System.Drawing.Point(13, 9);
+            this.title.Name = "title";
+            this.title.Size = new System.Drawing.Size(266, 20);
+            this.title.TabIndex = 6;
+            this.title.Text = "Joint Tolerances (+/- degrees)";
+            // 
             // JSF
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(755, 481);
+            this.Controls.Add(this.title);
             this.Controls.Add(this.effectSelectorLabel);
             this.Controls.Add(this.effectSelector);
             this.Controls.Add(this.btnSavePose);
             this.Controls.Add(this.btnCancelSave);
             this.Controls.Add(this.jointSelectionGroup);
             this.Name = "JSF";
-            this.Text = "Joint Selection Form";
+            this.Text = "Joint Tolerances Form";
             this.Load += new System.EventHandler(this.Form1_Load);
             this.jointSelectionGroup.ResumeLayout(false);
             this.jointSelectionGroup.PerformLayout();
@@ -565,5 +576,6 @@
         private System.Windows.Forms.TextBox rightWristText;
         private System.Windows.Forms.ComboBox effectSelector;
         private System.Windows.Forms.Label effectSelectorLabel;
+        private System.Windows.Forms.Label title;
     }
 }
