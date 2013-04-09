@@ -15,7 +15,8 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         public bool save = false;
         // Array to hold user's joint options
         public double[] jointTolerances = new double[15];
-
+        // Array to hold effect options
+        public String[] effectNames = new String[5];
 
         public JSF()
         {
@@ -321,5 +322,6 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         {
             
         }
+
     }
 }
