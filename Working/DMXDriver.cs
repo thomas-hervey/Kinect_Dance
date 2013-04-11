@@ -113,6 +113,17 @@ namespace DmxComm
 
 
 
+        public void shutterStrobe()
+        {
+            int DMX_STROBE_CHANNEL = 1;
+            packet[startAddr + DMX_STROBE_CHANNEL - 1] = 72;
+
+        }
+
+
+
+
+
         public enum color_t { WHITE = 0, CTC = 12, YELLOW = 24, BLUE_104 = 36, PINK = 48, GREEN_206 = 60, BLUE_108 = 72, RED = 84, MAGENTA = 96, BLUE_101 = 108, GREEN_202 = 132, PURPLE = 144 };
 
 
@@ -142,6 +153,26 @@ namespace DmxComm
         }
 
         public enum speed_t { FAST = 246, MEDIUM = 251, SLOW = 255 };
+
+        public void randomStrobe(speed_t speed)
+        {
+            int STROBE_CHANNEL = 1;
+            byte temp = 0;
+            switch (speed)
+            {
+                case speed_t.FAST:
+                    temp = 128;
+                    break;
+                case speed_t.MEDIUM:
+                    temp = 148;
+                    break;
+                case speed_t.SLOW:
+                    temp = 168;
+                    break;
+            }
+
+            packet[startAddr + STROBE_CHANNEL - 1] = temp;
+        }
 
         public void setRandomColors(speed_t speed)
         {

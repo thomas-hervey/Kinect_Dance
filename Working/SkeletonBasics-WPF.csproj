@@ -64,6 +64,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Effects.cs" />
     <Compile Include="JointSelection.cs">
       <SubType>Form</SubType>
     </Compile>
