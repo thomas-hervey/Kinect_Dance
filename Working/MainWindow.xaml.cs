@@ -30,6 +30,9 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         /***************** User-created constants and variables *******************************************************************************************/
         /**************************************************************************************************************************************************/
 
+        public String[] functionNamesArray = new String[3];
+
+
         // Dmx Object
         DmxDriver dmxdev = new DmxDriver(150);
         int tempc = 0;
@@ -61,7 +64,8 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         // loadPose counter
         private int numPosesLoaded = 0;
 
-
+        public String[] functionNames = new String[3];
+        
 
 
         /* Stream variables */
@@ -96,6 +100,10 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 
             // Time variable started when pose is captured in getPose()
             public DateTime timeElapsed;
+
+            // The desired lighting function for this pose       
+            public String lightingEffectName;
+
         }
 
 
@@ -735,17 +743,23 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         {
             // Save off a pose from the stream
             skeletonPose capturedPose = currentStreamPose;
-
             // Open up the joint selection window
             JSF jointSelectionForm = new JSF();
             
+            // fill the function names
+            functionNamesArray[0] = "name 1";
+            functionNamesArray[1] = "name 2";
+            functionNamesArray[2] = "name 3";
+
+            jointSelectionForm.functionNamesArray = this.functionNamesArray;
+
             // Call the joint selection form
             jointSelectionForm.ShowDialog();
 
             // Save the pose with the desired joints to check
             if(jointSelectionForm.save == true)
             {
-                savePose(capturedPose, jointSelectionForm.jointTolerances);
+                savePose(capturedPose, jointSelectionForm.jointTolerances, jointSelectionForm.lightingEffectName);
             }
         }
 
@@ -753,7 +767,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         /// Once joints to check have been selected, write the pose to text
         /// </summary>
         /// <returns> N/A </returns>
-        private void savePose(skeletonPose capturedPose, double[] jointTolerances)
+        private void savePose(skeletonPose capturedPose, double[] jointTolerances, String lightingEffectName)
         {
 
             // Open file dialog to pick a save location
@@ -770,7 +784,13 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                 // For all of our joints, write out the joint name, angle and tolerance to a line
                 for (int i = 0; i < capturedPose.Joints.Length; i++)
                 {
-                    streamWriter.WriteLine(capturedPose.Names[i] + " " + Convert.ToString(capturedPose.Joints[i]) + " " + jointTolerances[i]);   
+                    streamWriter.WriteLine(capturedPose.Names[i] + " " + Convert.ToString(capturedPose.Joints[i]) + " " + jointTolerances[i]);
+                    
+                    // we are at the last index
+                    if ((i + 1) == capturedPose.Joints.Length)
+                    {
+                        streamWriter.WriteLine(lightingEffectName);
+                    }
                 }
                 streamWriter.Close();
             }
@@ -995,7 +1015,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             foreach (skeletonPose savedPose in poseArrayList)
             {
                 // If the current pose in the array matches, return that index and break
-                if (isPoseMatch(savedPose, currentStreamPose))
+                if (isPoseMatch(savedPose))
                 {
                     // Save off the matching poseArray pose index
                     matchingPoseArrayIndex = poseArrayList.IndexOf(savedPose);
@@ -1012,7 +1032,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         /// <param name="currentSkel"></param>
         /// <param name="jointsToCheckPoseNumber"></param>
         /// <returns>isCurrentPose: validity of comparison between the poses</returns>
-        private Boolean isPoseMatch(skeletonPose savedPose, skeletonPose currentStreamPose)
+        private Boolean isPoseMatch(skeletonPose savedPose)
         {
             // Setting pose match variable to true; after looking through all the desired joints and 
             // an non-matchis found, the variable will become false
@@ -1098,6 +1118,10 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             {
                 doTestFunction2();
             }
+            else if (matchingPoseArrayIndex == 2)
+            {
+                doTestFunction3();
+            }
 
          
         }
@@ -1158,6 +1182,24 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             dmxdev.setColorContinuous(DmxDriver.color_t.BLUE_101);
             dmxdev.setGoboStandard(3);
             
+        }
+
+        /// <summary>
+        /// Checks to see if the light will have a result: TEST FUNCTION
+        /// </summary>
+        /// <param name="capturedPose"></param>
+        /// <param name="currentSkel"></param>
+        /// <returns> N/A </returns>
+        private void doTestFunction3()
+        {
+            Console.WriteLine("DO TEST FUNCTION3");
+            tempc -= 1;
+            dmxdev.setLampOn();
+            dmxdev.setDimmerLevel(255);
+            dmxdev.setColorContinuous(DmxDriver.color_t.WHITE);
+            dmxdev.setTilt(120);
+            dmxdev.setPan(90);
+
         }
 
 
