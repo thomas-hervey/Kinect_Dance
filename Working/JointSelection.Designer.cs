@@ -489,7 +489,6 @@
             this.effectSelector.Name = "effectSelector";
             this.effectSelector.Size = new System.Drawing.Size(156, 21);
             this.effectSelector.TabIndex = 4;
-            this.effectSelector.SelectedIndexChanged += new System.EventHandler(this.effectSelector_SelectedIndexChanged);
             // 
             // effectSelectorLabel
             // 
