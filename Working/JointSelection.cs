@@ -17,6 +17,10 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         public double[] jointTolerances = new double[15];
         // Array to hold effect options
         public String[] effectNames = new String[5];
+        // String that holds the desired effect for this pose
+        public String lightingEffectName;
+
+        public String[] functionNamesArray = new String[3];
 
         public JSF()
         {
@@ -37,7 +41,9 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                     t.Enabled = false;
                 }
             }
-            // On load, populate the effect drop down menu
+
+            // Populate the drop down menu
+            effectSelector.DataSource = functionNamesArray;
             
         }
 
@@ -114,6 +120,9 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                 }
                 i --;
             }
+             
+            // Set the effect variable to the drop down choice
+            lightingEffectName = effectSelector.SelectedValue.ToString();
 
             save = true;
             this.Close();   
@@ -312,15 +321,6 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                 centerShouldersText.Enabled = false;
                 centerShouldersText.Clear();
             }
-        }
-
-        /// <summary>
-        /// Handler for the effect selection drop down menu
-        /// </summary>
-        /// <returns> N/A </returns>
-        private void effectSelector_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            
         }
 
     }
