@@ -291,6 +291,10 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             {
                 this.statusBarText.Text = Properties.Resources.NoKinectReady;
             }
+
+            effectNamesArray[0] = "doTestFunction";
+            effectNamesArray[1] = "doTestFunction2";
+            effectNamesArray[2] = "doTestFunction3";
         }
 
         /// <summary>
@@ -382,10 +386,10 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                                 if (matchingPoseArrayIndex != -99)
                                 {
                                     //Lets the user know which pose the program thinks is a match
-                                    txtCapturedInfo.Text = "Matching Pose seen: " + matchingPoseArrayIndex;
+                                    txtCapturedInfo.Text = "Matching Pose seen: " + ((skeletonPose)poseArrayList[matchingPoseArrayIndex]).lightingEffectName;
 
                                     // Passes the pose to the lighting handler
-                                    staticLightingHandler(matchingPoseArrayIndex);
+                                    staticLightingHandler((skeletonPose)poseArrayList[matchingPoseArrayIndex]);
                                 }
                             }
 
@@ -745,11 +749,6 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             skeletonPose capturedPose = currentStreamPose;
             // Open up the joint selection window
             JSF jointSelectionForm = new JSF();
-            
-            // Fill the function names
-            effectNamesArray[0] = "doTestFunction";
-            effectNamesArray[1] = "doTestFunction2";
-            effectNamesArray[2] = "doTestFunction3";
 
             //jointSelectionForm.mainPoseImage = this.imageSource;
 
@@ -1115,18 +1114,17 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         /// </summary>
         /// <param name="macthingPoseArrayIndex"></param>
         /// <returns>N/A</returns>
-        private void staticLightingHandler(int matchingPoseArrayIndex)
+        private void staticLightingHandler(skeletonPose matchedPose)
         {
-            // Save off the matching saved pose from poseArray globally
-            matchedSavedPose = (skeletonPose)poseArrayList[matchingPoseArrayIndex];
-            
-            if (matchingPoseArrayIndex == 0)
-            { doTestFunction(); }
-            else if (matchingPoseArrayIndex == 1)
+            if (matchedPose.lightingEffectName == effectNamesArray[0])
+            { 
+                doTestFunction();
+            }
+            else if (matchedPose.lightingEffectName == effectNamesArray[1])
             {
                 doTestFunction2();
             }
-            else if (matchingPoseArrayIndex == 2)
+            else if (matchedPose.lightingEffectName == effectNamesArray[2])
             {
                 doTestFunction3();
             }
