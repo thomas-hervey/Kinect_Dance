@@ -19,14 +19,14 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
     using DmxComm;
 
 
-
+    
 
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
     public partial class MainWindow : Window
     {
-
+        
         /***************** User-created constants and variables *******************************************************************************************/
         /**************************************************************************************************************************************************/
 
@@ -40,10 +40,11 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         /* Mode selection variables */
 
         // Mode designation
-        private Boolean isLiveMode = false;
+        //DEPRECATED private Boolean isLiveMode = false;
 
 
-
+        enum mode { LiveMode, CaptureMode, DynamicMode }
+        private mode CurrentMode = mode.CaptureMode;
 
         /* Saving pose variables */
         
@@ -304,6 +305,8 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             }
         }
 
+        enum dyn_modes {HAND_PAN_TILT, NONE};
+
         /// <summary>
         /// Event handler for Kinect sensor's SkeletonFrameReady event
         /// </summary>
@@ -312,7 +315,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         private void SensorSkeletonFrameReady(object sender, SkeletonFrameReadyEventArgs e)
         {
             Skeleton[] skeletons = new Skeleton[0];
-
+            
             using (SkeletonFrame skeletonFrame = e.OpenSkeletonFrame())
             {
                 if (skeletonFrame != null)
@@ -362,13 +365,13 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                             currentStreamPose = getPose(skel);
 
                             // If the user is in capture mode Don't allow pose checking or lighting effects
-                            if (isLiveMode == false)
+                            if (CurrentMode == mode.CaptureMode)
                             {
                                 txtCapturedInfo.Text = "In capture mode";
                             }
 
                             // If the user is in live mode: Allow pose checking & lighting effects
-                            else if (isLiveMode == true)
+                            else if (CurrentMode == mode.LiveMode)
                             {
                                 txtCapturedInfo.Text = "In live mode";
                                 // Compares if the currentStreamPose pose matches any of the saved poses in poseArray
@@ -561,7 +564,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         private void captureMode_Checked(object sender, RoutedEventArgs e)
         {
             // Setting the mode option to capture
-            isLiveMode = false;
+            CurrentMode = mode.CaptureMode;
             // Enabling capture function buttons
             capturePose.IsEnabled = true;
             loadPose.IsEnabled = true;
@@ -577,8 +580,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             if (poseArrayList.Count == 0)
             {
                 txtCapturedInfo.Text = "There are no loaded poses yet. Cannot start live mode.";
-                isLiveMode = false;
-
+                CurrentMode = mode.CaptureMode;
                 // Change the radio buttons
                 liveMode.IsChecked = false;
                 captureMode.IsChecked = true;
@@ -586,7 +588,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             else
             {
                 // Setting the mode option to live
-                isLiveMode = true;
+                CurrentMode = mode.LiveMode;
                 // Disabling capture function buttons
                 capturePose.IsEnabled = false;
                 loadPose.IsEnabled = false;
