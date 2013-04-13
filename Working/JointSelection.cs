@@ -20,7 +20,9 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         // String that holds the desired effect for this pose
         public String lightingEffectName;
 
-        public String[] functionNamesArray = new String[3];
+        public String[] effectNamesArray = new String[3];
+
+        public Image mainPoseImage;
 
         public JSF()
         {
@@ -43,8 +45,8 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             }
 
             // Populate the drop down menu
-            effectSelector.DataSource = functionNamesArray;
-            
+            effectSelector.DataSource = effectNamesArray;
+            poseImage.Image = mainPoseImage;
         }
 
         /// <summary>

@@ -71,7 +71,9 @@
             this.effectSelector = new System.Windows.Forms.ComboBox();
             this.effectSelectorLabel = new System.Windows.Forms.Label();
             this.title = new System.Windows.Forms.Label();
+            this.poseImage = new System.Windows.Forms.PictureBox();
             this.jointSelectionGroup.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.poseImage)).BeginInit();
             this.SuspendLayout();
             // 
             // jointSelectionGroup
@@ -464,7 +466,7 @@
             // 
             // btnCancelSave
             // 
-            this.btnCancelSave.Location = new System.Drawing.Point(668, 31);
+            this.btnCancelSave.Location = new System.Drawing.Point(504, 530);
             this.btnCancelSave.Name = "btnCancelSave";
             this.btnCancelSave.Size = new System.Drawing.Size(75, 30);
             this.btnCancelSave.TabIndex = 2;
@@ -474,7 +476,7 @@
             // 
             // btnSavePose
             // 
-            this.btnSavePose.Location = new System.Drawing.Point(587, 31);
+            this.btnSavePose.Location = new System.Drawing.Point(411, 530);
             this.btnSavePose.Name = "btnSavePose";
             this.btnSavePose.Size = new System.Drawing.Size(75, 30);
             this.btnSavePose.TabIndex = 3;
@@ -485,7 +487,7 @@
             // effectSelector
             // 
             this.effectSelector.FormattingEnabled = true;
-            this.effectSelector.Location = new System.Drawing.Point(587, 137);
+            this.effectSelector.Location = new System.Drawing.Point(411, 261);
             this.effectSelector.Name = "effectSelector";
             this.effectSelector.Size = new System.Drawing.Size(156, 21);
             this.effectSelector.TabIndex = 4;
@@ -494,7 +496,7 @@
             // 
             this.effectSelectorLabel.AutoSize = true;
             this.effectSelectorLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.effectSelectorLabel.Location = new System.Drawing.Point(619, 117);
+            this.effectSelectorLabel.Location = new System.Drawing.Point(450, 245);
             this.effectSelectorLabel.Name = "effectSelectorLabel";
             this.effectSelectorLabel.Size = new System.Drawing.Size(90, 13);
             this.effectSelectorLabel.TabIndex = 5;
@@ -510,11 +512,20 @@
             this.title.TabIndex = 6;
             this.title.Text = "Joint Tolerances (+/- degrees)";
             // 
+            // poseImage
+            // 
+            this.poseImage.Location = new System.Drawing.Point(12, 245);
+            this.poseImage.Name = "poseImage";
+            this.poseImage.Size = new System.Drawing.Size(393, 315);
+            this.poseImage.TabIndex = 7;
+            this.poseImage.TabStop = false;
+            // 
             // JSF
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(755, 481);
+            this.ClientSize = new System.Drawing.Size(595, 572);
+            this.Controls.Add(this.poseImage);
             this.Controls.Add(this.title);
             this.Controls.Add(this.effectSelectorLabel);
             this.Controls.Add(this.effectSelector);
@@ -526,6 +537,7 @@
             this.Load += new System.EventHandler(this.Form1_Load);
             this.jointSelectionGroup.ResumeLayout(false);
             this.jointSelectionGroup.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.poseImage)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -576,5 +588,6 @@
         private System.Windows.Forms.ComboBox effectSelector;
         private System.Windows.Forms.Label effectSelectorLabel;
         private System.Windows.Forms.Label title;
+        private System.Windows.Forms.PictureBox poseImage;
     }
 }

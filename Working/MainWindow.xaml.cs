@@ -30,9 +30,6 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         /***************** User-created constants and variables *******************************************************************************************/
         /**************************************************************************************************************************************************/
 
-        public String[] functionNamesArray = new String[3];
-
-
         // Dmx Object
         DmxDriver dmxdev = new DmxDriver(150);
         int tempc = 0;
@@ -49,6 +46,10 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         
         // writePose counter
         private int numPosesWritten = 0;
+        // array to hold the names of lighting effects (populates combobox in JSF)
+        public String[] effectNamesArray = new String[3];
+        // Data to send off the image of the skeleton pose to JSF
+        public ImageSource mainPoseImage;
         
 
 
@@ -64,7 +65,6 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         // loadPose counter
         private int numPosesLoaded = 0;
 
-        public String[] functionNames = new String[3];
         
 
 
@@ -186,6 +186,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         /// Drawing image that we will display
         /// </summary>
         private DrawingImage imageSource;
+
 
         /// <summary>
         /// Initializes a new instance of the MainWindow class.
@@ -595,9 +596,6 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 
 
 
-
-
-
         /* ***** WRITE POSE FUNCTIONS***** */
 
 
@@ -746,12 +744,15 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             // Open up the joint selection window
             JSF jointSelectionForm = new JSF();
             
-            // fill the function names
-            functionNamesArray[0] = "name 1";
-            functionNamesArray[1] = "name 2";
-            functionNamesArray[2] = "name 3";
+            // Fill the function names
+            effectNamesArray[0] = "doTestFunction";
+            effectNamesArray[1] = "doTestFunction2";
+            effectNamesArray[2] = "doTestFunction3";
 
-            jointSelectionForm.functionNamesArray = this.functionNamesArray;
+            //jointSelectionForm.mainPoseImage = this.imageSource;
+
+            // Send an array of lighting effect names to the joint selection form
+            jointSelectionForm.effectNamesArray = this.effectNamesArray;
 
             // Call the joint selection form
             jointSelectionForm.ShowDialog();
@@ -761,6 +762,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             {
                 savePose(capturedPose, jointSelectionForm.jointTolerances, jointSelectionForm.lightingEffectName);
             }
+            
         }
 
         /// <summary>
@@ -786,7 +788,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                 {
                     streamWriter.WriteLine(capturedPose.Names[i] + " " + Convert.ToString(capturedPose.Joints[i]) + " " + jointTolerances[i]);
                     
-                    // we are at the last index
+                    // The last line corresponds to the desired lighting effect
                     if ((i + 1) == capturedPose.Joints.Length)
                     {
                         streamWriter.WriteLine(lightingEffectName);
@@ -837,32 +839,36 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             char[] delimiters = { ' ',':' };
             // String that'll hold each line of the pose text file
             string line;
+
             // Read and display lines from the file until the end of the file is reached
             while ((line = streamReader.ReadLine()) != null) 
             {
                 string[] words = line.Split(delimiters);
-                int whichJoint = poseToFill.jointFromName[words[NAME_INDEX]];                  // joint name = first word of line
-                poseToFill.Joints[whichJoint] = Convert.ToDouble(words[ANGLE_INDEX]);          // joint angle = second word
-                poseToFill.Tolerance[whichJoint] = Convert.ToDouble(words[TOLERANCE_INDEX]);   // joint tolerance = third word
+                // Checking to see if the line is our lighting effect (recognize single word line)
+                if(words.Length == 1)
+                {
+                    poseToFill.lightingEffectName = words[0];
+                }
+                // Otherwise, split each line and save their values into a new pose
+                else
+                {
+                    int whichJoint = poseToFill.jointFromName[words[NAME_INDEX]];                  // joint name = first word of line
+                    poseToFill.Joints[whichJoint] = Convert.ToDouble(words[ANGLE_INDEX]);          // joint angle = second word
+                    poseToFill.Tolerance[whichJoint] = Convert.ToDouble(words[TOLERANCE_INDEX]);   // joint tolerance = third word
+                }
             }
-            // Set the effectName to the user's chosen effect
-            //poseToFill.effectName = effectName;
-
-            txtCapturedInfo.Text = Convert.ToString(poseToFill.Joints[1]);
 
             // Place the newly filled pose into the poseArray
             poseArrayList.Add(poseToFill);
             // Increase the pose loaded counter
             numPosesLoaded++;
 
+            // User feedback once pose is loaded
+            txtCapturedInfo.Text += Convert.ToString("Added a new pose with the effect: " + poseToFill.lightingEffectName + "\n");
+            txtCapturedInfo.Text += Convert.ToString("Total number of loaded poses: " + numPosesLoaded);
+
             streamReader.Close();
             openFile.Dispose();
-
-
-            // tests
-
-            //skeletonPose loadedTest = (skeletonPose)poseArrayList[0];
-            txtCapturedInfo.Text = "Pose added to index: " + poseArrayList.Count; //loadedTest.Names[3] + " " + loadedTest.Joints[4] + " " + loadedTest.Tolerance[3];
         }
 
 
