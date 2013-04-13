@@ -40,7 +40,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         //DEPRECATED private Boolean isLiveMode = false;
 
 
-        enum mode { LiveMode, CaptureMode, DynamicMode }
+        enum mode { StaticMode, CaptureMode, DynamicMode }
         private mode CurrentMode = mode.CaptureMode;
 
         /* Saving pose variables */
@@ -310,7 +310,8 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             }
         }
 
-        enum dyn_modes {HAND_PAN_TILT, NONE};
+        enum dynmodes {HAND_PAN_TILT, NONE};
+        private dynmodes currentDyanmicMode = dynmodes.NONE;
 
         /// <summary>
         /// Event handler for Kinect sensor's SkeletonFrameReady event
@@ -376,9 +377,9 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                             }
 
                             // If the user is in live mode: Allow pose checking & lighting effects
-                            else if (CurrentMode == mode.LiveMode)
+                            else if (CurrentMode == mode.StaticMode)
                             {
-                                txtCapturedInfo.Text = "In live mode";
+                                txtCapturedInfo.Text = "In static mode";
                                 // Compares if the currentStreamPose pose matches any of the saved poses in poseArray
                                 matchingPoseArrayIndex = poseChecker();
 
@@ -391,6 +392,11 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                                     // Passes the pose to the lighting handler
                                     staticLightingHandler((skeletonPose)poseArrayList[matchingPoseArrayIndex]);
                                 }
+                            }
+                            else if (CurrentMode == mode.DynamicMode)
+                            {
+                                dynamicModeHandler(skel);                        
+
                             }
 
 
@@ -419,6 +425,22 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 
                 // prevent drawing outside of our render areaoa
                 this.drawingGroup.ClipGeometry = new RectangleGeometry(new Rect(0.0, 0.0, RenderWidth, RenderHeight));
+            }
+        }
+
+        private void dynamicModeHandler(Skeleton skel)
+        {
+            currentDyanmicMode = dynmodes.HAND_PAN_TILT;
+            switch (currentDyanmicMode)
+            {
+                case dynmodes.HAND_PAN_TILT:
+             
+                    double jointDistance = getDistanceJoints(skel.Joints[JointType.HandLeft], skel.Joints[JointType.HandRight]);
+                    txtCapturedInfo.Text = "Joint Distance: " + jointDistance; 
+                    
+                    break;
+                case dynmodes.NONE:
+                    break;
             }
         }
 
@@ -563,7 +585,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 
         
         /// <summary>
-        /// Radio button function to select capture mode (instead of live performance mode)
+        /// Radio button function to select capture mode
         /// </summary>
         /// <returns> N/A </returns>
         private void captureMode_Checked(object sender, RoutedEventArgs e)
@@ -576,10 +598,10 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         }
 
         /// <summary>
-        /// Radio button function to select live performance mode (instead of capture mode)
+        /// Radio button function to select static performance mode
         /// </summary>
         /// <returns> N/A </returns>
-        private void liveMode_Checked(object sender, RoutedEventArgs e)
+        private void staticMode_Checked(object sender, RoutedEventArgs e)
         {
             // If there aren't any poses in our array, don't set up live mode yet
             if (poseArrayList.Count == 0)
@@ -587,17 +609,30 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                 txtCapturedInfo.Text = "There are no loaded poses yet. Cannot start live mode.";
                 CurrentMode = mode.CaptureMode;
                 // Change the radio buttons
-                liveMode.IsChecked = false;
+                staticMode.IsChecked = false;
                 captureMode.IsChecked = true;
             }
             else
             {
                 // Setting the mode option to live
-                CurrentMode = mode.LiveMode;
+                CurrentMode = mode.StaticMode;
                 // Disabling capture function buttons
                 capturePose.IsEnabled = false;
                 loadPose.IsEnabled = false;
             }
+        }
+
+        /// <summary>
+        /// Radio button function to select dynamic performance mode
+        /// </summary>
+        /// <returns> N/A </returns>
+        private void dynamicMode_Checked(object sender, RoutedEventArgs e)
+        {
+            // Setting the mode option to live
+            CurrentMode = mode.DynamicMode;
+            // Disabling capture function buttons
+            capturePose.IsEnabled = false;
+            loadPose.IsEnabled = false;
         }
 
 

@@ -58,6 +58,12 @@ namespace DmxComm
 
         ~DmxDriver()
         {
+            //return to a 0'ed mode on exit
+            for (int i = 0; i < DMX_PACKET_SIZE; i++)
+            {
+                packet[i] = 0;
+            }
+            Thread.Sleep(50);
             this.stop();
             device.Close();
         }
