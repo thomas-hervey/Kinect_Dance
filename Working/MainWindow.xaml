@@ -103,25 +103,26 @@
                         </TransformGroup>
                     </TextBox.RenderTransform></TextBox>
         	</InlineUIContainer></TextBlock>
-        <GroupBox x:Name="functionMode" Header="Function Mode" Margin="573,0,38,3" FontWeight="Bold">
+        <GroupBox x:Name="functionMode" Header="Function Mode" Margin="573,0,38,0" FontWeight="Bold">
             <WrapPanel HorizontalAlignment="Left" Height="42" VerticalAlignment="Top" Width="96" Margin="0,0,-2,0">
-                <RadioButton x:Name="captureMode" Content="Capture Mode" Checked="captureMode_Checked" Height="18" Width="96" IsChecked="True" Cursor="Hand" RenderTransformOrigin="0.5,0.5" FontWeight="Normal">
+                <RadioButton x:Name="captureMode" Content="Capture Mode" Checked="captureMode_Checked" Height="18" Width="96" IsChecked="True" Cursor="Hand" RenderTransformOrigin="0.5,0.5" FontWeight="Normal"/>
+                <RadioButton x:Name="staticMode" Content="Static Mode" Checked="staticMode_Checked" Cursor="Hand" Height="16" RenderTransformOrigin="0.5,0.5" FontWeight="Normal">
                     <RadioButton.RenderTransform>
                         <TransformGroup>
                             <ScaleTransform/>
                             <SkewTransform/>
                             <RotateTransform/>
-                            <TranslateTransform Y="4"/>
+                            <TranslateTransform Y="-4"/>
                         </TransformGroup>
                     </RadioButton.RenderTransform>
                 </RadioButton>
-                <RadioButton x:Name="liveMode" Content="Live Mode" Checked="liveMode_Checked" Cursor="Hand" Height="16" RenderTransformOrigin="0.5,0.5" FontWeight="Normal">
+                <RadioButton x:Name="dynamicMode" Content="Dynamic Mode" HorizontalAlignment="Left" VerticalAlignment="Top" Width="100" RenderTransformOrigin="0.5,0.5" FontWeight="Normal" Checked="dynamicMode_Checked">
                     <RadioButton.RenderTransform>
                         <TransformGroup>
                             <ScaleTransform/>
                             <SkewTransform/>
                             <RotateTransform/>
-                            <TranslateTransform Y="7"/>
+                            <TranslateTransform Y="-6"/>
                         </TransformGroup>
                     </RadioButton.RenderTransform>
                 </RadioButton>
