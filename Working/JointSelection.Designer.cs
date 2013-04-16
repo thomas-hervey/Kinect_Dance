@@ -466,7 +466,7 @@
             // 
             // btnCancelSave
             // 
-            this.btnCancelSave.Location = new System.Drawing.Point(504, 530);
+            this.btnCancelSave.Location = new System.Drawing.Point(531, 530);
             this.btnCancelSave.Name = "btnCancelSave";
             this.btnCancelSave.Size = new System.Drawing.Size(75, 30);
             this.btnCancelSave.TabIndex = 2;
@@ -476,7 +476,7 @@
             // 
             // btnSavePose
             // 
-            this.btnSavePose.Location = new System.Drawing.Point(411, 530);
+            this.btnSavePose.Location = new System.Drawing.Point(438, 530);
             this.btnSavePose.Name = "btnSavePose";
             this.btnSavePose.Size = new System.Drawing.Size(75, 30);
             this.btnSavePose.TabIndex = 3;
@@ -486,8 +486,9 @@
             // 
             // effectSelector
             // 
+            this.effectSelector.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.effectSelector.FormattingEnabled = true;
-            this.effectSelector.Location = new System.Drawing.Point(411, 261);
+            this.effectSelector.Location = new System.Drawing.Point(438, 261);
             this.effectSelector.Name = "effectSelector";
             this.effectSelector.Size = new System.Drawing.Size(156, 21);
             this.effectSelector.TabIndex = 4;
@@ -496,7 +497,7 @@
             // 
             this.effectSelectorLabel.AutoSize = true;
             this.effectSelectorLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.effectSelectorLabel.Location = new System.Drawing.Point(450, 245);
+            this.effectSelectorLabel.Location = new System.Drawing.Point(477, 245);
             this.effectSelectorLabel.Name = "effectSelectorLabel";
             this.effectSelectorLabel.Size = new System.Drawing.Size(90, 13);
             this.effectSelectorLabel.TabIndex = 5;
@@ -516,7 +517,8 @@
             // 
             this.poseImage.Location = new System.Drawing.Point(12, 245);
             this.poseImage.Name = "poseImage";
-            this.poseImage.Size = new System.Drawing.Size(393, 315);
+            this.poseImage.Size = new System.Drawing.Size(400, 325);
+            this.poseImage.SizeMode = System.Windows.Forms.PictureBoxSizeMode.AutoSize;
             this.poseImage.TabIndex = 7;
             this.poseImage.TabStop = false;
             // 
@@ -524,7 +526,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(595, 572);
+            this.ClientSize = new System.Drawing.Size(643, 633);
             this.Controls.Add(this.poseImage);
             this.Controls.Add(this.title);
             this.Controls.Add(this.effectSelectorLabel);

@@ -6,6 +6,7 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
+using System.Windows.Controls.Primitives;
 
 namespace Microsoft.Samples.Kinect.SkeletonBasics
 {
@@ -43,10 +44,11 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                     t.Enabled = false;
                 }
             }
-
+            Image skeletonImage = Image.FromFile("SkeletonImage.png");
             // Populate the drop down menu
             effectSelector.DataSource = effectNamesArray;
-            poseImage.Image = mainPoseImage;
+            poseImage.Image = skeletonImage;
+
         }
 
         /// <summary>

@@ -15,6 +15,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
     using System.Collections.Generic;
     using System.Collections;
     using Microsoft.Kinect;
+    using System.Windows.Media.Imaging;
     // Zachs DMX
     using DmxComm;
 
@@ -26,6 +27,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
     /// </summary>
     public partial class MainWindow : Window
     {
+        
         
         /***************** User-created constants and variables *******************************************************************************************/
         /**************************************************************************************************************************************************/
@@ -48,7 +50,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         // writePose counter
         private int numPosesWritten = 0;
         // array to hold the names of lighting effects (populates combobox in JSF)
-        public String[] effectNamesArray = new String[3];
+        public String[] effectNamesArray = new String[6];
         // Data to send off the image of the skeleton pose to JSF
         public ImageSource mainPoseImage;
         
@@ -110,15 +112,11 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 
 
 
-        /* Match pose and live performance mode function variables */
+        /* Static function variables */
 
         // poseArray index that identifies a match between the stream and a saved pose
         private int matchingPoseArrayIndex;
-        // SkeletonPose variable that is extracted from poseArray when it's found to match currentStreamPose  ***********
-        private skeletonPose matchedSavedPose;
-        // Timer that holds the elapsed time since a racognized match
-        // so that the program can't recapture the same pose in a short time
-        private TimeSpan timeSinceMatch;
+
 
         /***************************************************************************************************************************************************/
 
@@ -292,9 +290,10 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                 this.statusBarText.Text = Properties.Resources.NoKinectReady;
             }
 
-            effectNamesArray[0] = "doTestFunction";
-            effectNamesArray[1] = "doTestFunction2";
-            effectNamesArray[2] = "doTestFunction3";
+            effectNamesArray[0] = "staticFunction1";
+            effectNamesArray[1] = "staticFunction2";
+            effectNamesArray[2] = "staticFunction3";
+            effectNamesArray[3] = "staticFunction4";
         }
 
         /// <summary>
@@ -780,6 +779,8 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         /// <returns> N/A </returns>
         public void CapturePose(object sender, RoutedEventArgs e)
         {
+            System.Drawing.Image convertedImage = this.ConvertElement(Image);
+            convertedImage.Save("SkeletonImage.png");
             // Save off a pose from the stream
             skeletonPose capturedPose = currentStreamPose;
             // Open up the joint selection window
@@ -792,6 +793,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 
             // Call the joint selection form
             jointSelectionForm.ShowDialog();
+            
 
             // Save the pose with the desired joints to check
             if(jointSelectionForm.save == true)
@@ -799,6 +801,51 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                 savePose(capturedPose, jointSelectionForm.jointTolerances, jointSelectionForm.lightingEffectName);
             }
             
+        }
+
+
+        private System.Drawing.Image ConvertElement(FrameworkElement controlToRender)
+        {
+            RenderTargetBitmap rtb = new RenderTargetBitmap(
+            (int)controlToRender.ActualWidth, 
+            (int)controlToRender.ActualHeight, 
+            90, 
+            90, 
+            PixelFormats.Default);
+    
+            Visual vis = (Visual)controlToRender;
+            rtb.Render(vis);
+    
+            System.Windows.Controls.Image img = 
+            new System.Windows.Controls.Image();
+            img.Source = rtb;
+            img.Stretch = Stretch.None;
+            img.Measure(new System.Windows.Size(
+            (int)controlToRender.ActualWidth, 
+            (int)controlToRender.ActualHeight));
+            System.Windows.Size sizeImage = img.DesiredSize;
+            img.Arrange(new System.Windows.Rect(new 
+            System.Windows.Point(0, 0), sizeImage));
+    
+            RenderTargetBitmap rtb2 = new RenderTargetBitmap(
+            (int)rtb.Width, 
+            (int)rtb.Height, 
+            90, 
+            90, 
+            PixelFormats.Default);
+            rtb2.Render(img);
+    
+            PngBitmapEncoder png = new PngBitmapEncoder();
+            png.Frames.Add(BitmapFrame.Create(rtb2));
+    
+            Stream ms = new MemoryStream();
+            png.Save(ms);
+    
+            ms.Position = 0;
+    
+            System.Drawing.Image retImg = 
+            System.Drawing.Image.FromStream(ms);
+            return retImg;
         }
 
         /// <summary>
@@ -1151,20 +1198,27 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         /// <returns>N/A</returns>
         private void staticLightingHandler(skeletonPose matchedPose)
         {
+            // Static lighting effect 1
             if (matchedPose.lightingEffectName == effectNamesArray[0])
             { 
-                doTestFunction();
+                staticFunction1();
             }
+            // Static lighting effect 2
             else if (matchedPose.lightingEffectName == effectNamesArray[1])
             {
-                doTestFunction2();
+                staticFunction2();
             }
+            // Static lighting effect 3
             else if (matchedPose.lightingEffectName == effectNamesArray[2])
             {
-                doTestFunction3();
+                staticFunction3();
+            }
+            // Static lighting effect 4
+            else if (matchedPose.lightingEffectName == effectNamesArray[3])
+            {
+                staticFunction4();
             }
 
-         
         }
 
 
@@ -1188,15 +1242,23 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             return isCurrentPose;
         }
 
+
+
+
+
+
+        /* *****STATIC FUNCTIONS***** */
+
+
         /// <summary>
-        /// Checks to see if the light will have a result: TEST FUNCTION
+        /// Ideal matched pose: 
         /// </summary>
         /// <param name="capturedPose"></param>
         /// <param name="currentSkel"></param>
         /// <returns> N/A </returns>
-        private void doTestFunction()
+        private void staticFunction1()
         {
-            Console.WriteLine("DO TEST FUNCTION");
+            txtStatic.Text = ("Static Function 1");
             tempc += 1;
             dmxdev.setLampOn();
             dmxdev.setDimmerLevel((byte)(tempc & 0xff));
@@ -1207,14 +1269,14 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         }
 
         /// <summary>
-        /// Checks to see if the light will have a result: TEST FUNCTION
+        /// Ideal matched pose: 
         /// </summary>
         /// <param name="capturedPose"></param>
         /// <param name="currentSkel"></param>
         /// <returns> N/A </returns>
-        private void doTestFunction2()
+        private void staticFunction2()
         {
-            Console.WriteLine("DO TEST FUNCTION2");
+            txtStatic.Text = ("Static Function 2");
             tempc -= 1;
             dmxdev.setLampOn();
             dmxdev.setDimmerLevel((byte)(tempc & 0xff));
@@ -1226,14 +1288,32 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         }
 
         /// <summary>
-        /// Checks to see if the light will have a result: TEST FUNCTION
+        /// Ideal matched pose: 
         /// </summary>
         /// <param name="capturedPose"></param>
         /// <param name="currentSkel"></param>
         /// <returns> N/A </returns>
-        private void doTestFunction3()
+        private void staticFunction3()
         {
-            Console.WriteLine("DO TEST FUNCTION3");
+            txtStatic.Text = ("Static Function 3");
+            tempc -= 1;
+            dmxdev.setLampOn();
+            dmxdev.setDimmerLevel(255);
+            dmxdev.setColorContinuous(DmxDriver.color_t.WHITE);
+            dmxdev.setTilt(120);
+            dmxdev.setPan(90);
+
+        }
+
+        /// <summary>
+        /// Ideal matched pose: 
+        /// </summary>
+        /// <param name="capturedPose"></param>
+        /// <param name="currentSkel"></param>
+        /// <returns> N/A </returns>
+        private void staticFunction4()
+        {
+            txtStatic.Text = ("Static Function 4");
             tempc -= 1;
             dmxdev.setLampOn();
             dmxdev.setDimmerLevel(255);
