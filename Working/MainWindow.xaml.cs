@@ -33,7 +33,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         /**************************************************************************************************************************************************/
 
         // Dmx Object
-        DmxDriver dmxdev = new DmxDriver(150);
+        DmxDriver dmxdev = new DmxDriver(1);
         int tempc = 0;
 
         /* Mode selection variables */
@@ -427,16 +427,48 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             }
         }
 
+        private float getAverage(ArrayList list)
+        {
+            float sum = 0;
+            foreach(float item in list){
+                sum += item;
+            }
+
+            return (sum / list.Count);
+        }
+        ArrayList xList = new ArrayList();
+        ArrayList yList = new ArrayList();
         private void dynamicModeHandler(Skeleton skel)
         {
             currentDyanmicMode = dynmodes.HAND_PAN_TILT;
             switch (currentDyanmicMode)
             {
                 case dynmodes.HAND_PAN_TILT:
-             
-                    double jointDistance = getDistanceJoints(skel.Joints[JointType.HandLeft], skel.Joints[JointType.HandRight]);
-                    txtCapturedInfo.Text = "Joint Distance: " + jointDistance; 
-                    
+
+                    float panPos;
+                    float tiltPos;
+
+                    //Attempt at smoothing our data points, average position over 5 frames before calculating a new position
+                    if (xList.Count < 5)
+                    {
+                        xList.Add(skel.Joints[JointType.HandLeft].Position.X * 127);
+                        yList.Add(skel.Joints[JointType.HandLeft].Position.Y * 127);
+                        return;
+                    }
+                    else
+                    {
+                        panPos = getAverage(xList);
+                        tiltPos = getAverage(yList);
+                        xList.Clear();
+                        yList.Clear();
+                    }
+
+                    //double jointDistance = getDistanceJoints(skel.Joints[JointType.HandLeft], skel.Joints[JointType.HandRight]);
+                    //txtCapturedInfo.Text = "Left Hand X:" + (int)(skel.Joints[JointType.HandLeft].Position.X * 127);
+
+                    dmxdev.setPan((int)panPos);
+                    dmxdev.setTilt((int)tiltPos);
+
                     break;
                 case dynmodes.NONE:
                     break;

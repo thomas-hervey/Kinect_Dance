@@ -94,8 +94,8 @@ namespace DmxComm
                 byte[] header = new byte[4];
                 header[0] = 0x7E; //start code
                 header[1] = 6; //DMX TX
-                header[2] = 255 & 0xFF; //pack length logical and with max packet size
-                header[3] = (255 >> 8) & 0xFF; //packet length shifted by byte length? DMX standard idk
+                header[2] = 16 & 0xFF; //pack length logical and with max packet size
+                header[3] = (16 >> 8) & 0xFF; //packet length shifted by byte length? DMX standard idk
 
 
                 result = device.Write(header, 4, ref written);//send dmx header
@@ -104,7 +104,7 @@ namespace DmxComm
                 //Console.WriteLine(written);
 
                 packet[0] = 0;
-                result = device.Write(packet, 255, ref written);//send data array
+                result = device.Write(packet, 16, ref written);//send data array
                 //Console.WriteLine(result);
                 //Console.WriteLine(written);
 
@@ -112,7 +112,7 @@ namespace DmxComm
                 byte[] endcode = new byte[1];
                 endcode[0] = 0xE7;
                 device.Write(endcode, 1, ref written);//send dmx end code
-                Thread.Sleep(33); //sleep for 1/30~ second
+                Thread.Sleep(25); //sleep for 1/40 second
             }
         }
 
