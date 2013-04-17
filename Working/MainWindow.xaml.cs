@@ -441,10 +441,15 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         ArrayList yList = new ArrayList();
         private void dynamicModeHandler(Skeleton skel)
         {
+            txtCapturedInfo.Text = "Distance from head Left:" + getDistanceJoints(skel.Joints[JointType.Head], skel.Joints[JointType.HandLeft]) + " Right:" + getDistanceJoints(skel.Joints[JointType.Head], skel.Joints[JointType.HandRight]);
             currentDyanmicMode = dynmodes.HAND_PAN_TILT;
             switch (currentDyanmicMode)
             {
                 case dynmodes.HAND_PAN_TILT:
+                    dmxdev.setLampOn();
+
+                    float dimmerLevel = skel.Joints[JointType.HandRight].Position.Y * 255;
+                    dmxdev.setDimmerLevel((int)dimmerLevel);
 
                     float panPos;
                     float tiltPos;
