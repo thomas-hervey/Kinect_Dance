@@ -466,7 +466,7 @@
             // 
             // btnCancelSave
             // 
-            this.btnCancelSave.Location = new System.Drawing.Point(531, 530);
+            this.btnCancelSave.Location = new System.Drawing.Point(681, 79);
             this.btnCancelSave.Name = "btnCancelSave";
             this.btnCancelSave.Size = new System.Drawing.Size(75, 30);
             this.btnCancelSave.TabIndex = 2;
@@ -476,7 +476,7 @@
             // 
             // btnSavePose
             // 
-            this.btnSavePose.Location = new System.Drawing.Point(438, 530);
+            this.btnSavePose.Location = new System.Drawing.Point(600, 79);
             this.btnSavePose.Name = "btnSavePose";
             this.btnSavePose.Size = new System.Drawing.Size(75, 30);
             this.btnSavePose.TabIndex = 3;
@@ -488,7 +488,7 @@
             // 
             this.effectSelector.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.effectSelector.FormattingEnabled = true;
-            this.effectSelector.Location = new System.Drawing.Point(438, 261);
+            this.effectSelector.Location = new System.Drawing.Point(600, 47);
             this.effectSelector.Name = "effectSelector";
             this.effectSelector.Size = new System.Drawing.Size(156, 21);
             this.effectSelector.TabIndex = 4;
@@ -526,7 +526,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(643, 633);
+            this.ClientSize = new System.Drawing.Size(855, 633);
             this.Controls.Add(this.poseImage);
             this.Controls.Add(this.title);
             this.Controls.Add(this.effectSelectorLabel);
