@@ -549,15 +549,19 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 
             dmxdev.setShutterOpen();
             dmxdev.setLampOn();
-            float x = skel.Joints[JointType.HipCenter].Position.X;
+            float hipX = skel.Joints[JointType.HipCenter].Position.X;
 
-            if (x > 0)
+            if (hipX > 0)
             {
-                dmxdev.setPan((int)(calPanLeft * x));
+                dmxdev.setPan((int)(calPanLeft * hipX));
+            }
+            else if (hipX < 0)
+            {
+                dmxdev.setPan((int)(calPanRight * hipX));
             }
             else
             {
-                dmxdev.setPan((int)(calPanRight * x));
+                dmxdev.setPan((int)( (calPanRight + calPanLeft)/2.0) );
             }
 
 
