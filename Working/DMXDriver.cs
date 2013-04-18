@@ -19,6 +19,10 @@ namespace DmxComm
         static volatile bool running = true;
 
         private byte[] packet;
+        /// <summary>
+        /// DmxDriver object, only one instance of this object should ever exist
+        /// </summary>
+        /// <param name="baseDmxAddr">The address the DMX light is set to</param>
         public DmxDriver(int baseDmxAddr)
         {
             startAddr = baseDmxAddr;
@@ -68,11 +72,18 @@ namespace DmxComm
             device.Close();
         }
 
+        /// <summary>
+        /// Returns the connection status
+        /// </summary>
+        /// <returns></returns>
         public bool deviceConnected()
         {
             return connected;
         }
 
+        /// <summary>
+        /// Stops the device
+        /// </summary>
         public void stop()
         {
             running = false;
@@ -81,7 +92,12 @@ namespace DmxComm
             device.Close();
         }
 
-        public static void sendData(byte[] packet, FTDI device)
+        /// <summary>
+        /// Send data thread for the device
+        /// </summary>
+        /// <param name="packet"></param>
+        /// <param name="device"></param>
+        private static void sendData(byte[] packet, FTDI device)
         {
             //device.SetBreak(false);
             //System.Threading.Thread.Sleep(40);
@@ -118,7 +134,9 @@ namespace DmxComm
 
 
 
-
+        /// <summary>
+        /// Sets the DMX light to strobe mode
+        /// </summary>
         public void shutterStrobe()
         {
             int DMX_STROBE_CHANNEL = 1;
@@ -132,7 +150,10 @@ namespace DmxComm
 
         public enum color_t { WHITE = 0, CTC = 12, YELLOW = 24, BLUE_104 = 36, PINK = 48, GREEN_206 = 60, BLUE_108 = 72, RED = 84, MAGENTA = 96, BLUE_101 = 108, GREEN_202 = 132, PURPLE = 144 };
 
-
+        /// <summary>
+        /// Function sets a color on the DMX light
+        /// </summary>
+        /// <param name="c">Enumerated type color_t</param>
         public void setColorContinuous(color_t c)
         {
             int COLOR_CHANNEL = 3;
@@ -160,6 +181,10 @@ namespace DmxComm
 
         public enum speed_t { FAST = 246, MEDIUM = 251, SLOW = 255 };
 
+        /// <summary>
+        /// Sets a random strobe effect on the DMX light(random strobe pattern), can be set to FAST MEDIUM SLOW
+        /// </summary>
+        /// <param name="speed">speed_t enum type</param>
         public void randomStrobe(speed_t speed)
         {
             int STROBE_CHANNEL = 1;
@@ -180,6 +205,10 @@ namespace DmxComm
             packet[startAddr + STROBE_CHANNEL - 1] = temp;
         }
 
+        /// <summary>
+        /// Sets the light to randomly change colors, speeds FAST MEDIUM or SLOW
+        /// </summary>
+        /// <param name="speed">enum speed_t</param>
         public void setRandomColors(speed_t speed)
         {
             int COLOR_CHANNEL = 3;
@@ -193,6 +222,9 @@ namespace DmxComm
             }
         }
 
+        /// <summary>
+        /// Turns device light on, note: may also need to open shutter
+        /// </summary>
         public void setLampOn()
         {
             int DMX_LAMP_ON = 237;
@@ -201,6 +233,9 @@ namespace DmxComm
             packet[startAddr + LAMP_ON_CHANNEL - 1] = (byte)DMX_LAMP_ON;
         }
 
+        /// <summary>
+        /// Turns device light off
+        /// </summary>
         public void setLampOff()
         {
             int DMX_LAMP_OFF = 254;
@@ -209,6 +244,9 @@ namespace DmxComm
             packet[startAddr + DMX_LAMP_OFF_CHANNEL - 1] = (byte)DMX_LAMP_OFF;
         }
 
+        /// <summary>
+        /// Opens device shutter
+        /// </summary>
         public void setShutterOpen()
         {
             int DMX_SHUTTER_OPEN = 49;
@@ -216,7 +254,9 @@ namespace DmxComm
 
             packet[startAddr + DMX_SHUTTER_CHANNEL - 1] = (byte)DMX_SHUTTER_OPEN;
         }
-
+        /// <summary>
+        /// Closes device shutter
+        /// </summary>
         public void setShutterClose()
         {
             int DMX_SHUTTER_CLOSE = 2;
@@ -225,6 +265,10 @@ namespace DmxComm
             packet[startAddr + DMX_SHUTTER_CHANNEL - 1] = (byte)DMX_SHUTTER_CLOSE;
         }
 
+        /// <summary>
+        /// Sets the dimmer level for the device
+        /// </summary>
+        /// <param name="level">int 0-255, 255 being max brightness</param>
         public void setDimmerLevel(int level)
         {
             int DMX_DIMMER_CHANNEL = 2;
@@ -238,6 +282,11 @@ namespace DmxComm
         //only using standard gobos for now
         const int GOBO_COUNT = 8;
         const int GOBO_CHANNEL = 4;
+
+        /// <summary>
+        /// Set gobo, undocumented which values are what, but takes an int from 0-8
+        /// </summary>
+        /// <param name="goboVal">int 0-8</param>
         public void setGoboStandard(int goboVal)
         {
             byte[] dmxGoboVals = new byte[] { 19, 29, 39, 49, 59, 69, 79, 85 };
@@ -248,7 +297,9 @@ namespace DmxComm
             }
         }
 
-        //valid for standard and indexed mode
+        /// <summary>
+        /// Clears the gobo
+        /// </summary>
         public void clearGobo()
         {
             packet[startAddr + GOBO_CHANNEL - 1] = 0;
@@ -258,6 +309,11 @@ namespace DmxComm
         const int FOCUS_CHANNEL = 6;
 
         //focus 0 = infinity, 255 = 2 meters
+
+        /// <summary>
+        /// Sets the light focus
+        /// </summary>
+        /// <param name="focus">value from 0 to 255, 0 = focus infinity, 255 = focus to 2 meters</param>
         public void setFocus(int focus)
         {
             if (focus >= MIN_FOCUS && focus <= MAX_FOCUS)
@@ -267,6 +323,9 @@ namespace DmxComm
         }
 
         const int PRISM_CHANNEL = 7;
+        /// <summary>
+        /// Turns the prism rotation off
+        /// </summary>
         public void setPrismOff()
         {
             packet[startAddr + PRISM_CHANNEL - 1] = 0;
@@ -275,6 +334,11 @@ namespace DmxComm
         //intensity range 0-59
         public enum rotation_direction_t { CW, CCW };
 
+        /// <summary>
+        /// Function is used to rotate a gobo
+        /// </summary>
+        /// <param name="direction">enum for clockwise and counterclockwise</param>
+        /// <param name="intensity">int from 0-59, 59 being max rotate speed</param>
         public void setPrismRotate(rotation_direction_t direction, int intensity)
         {
             int temp;
@@ -297,6 +361,10 @@ namespace DmxComm
         const int PAN_CHANNEL = 8;
 
         //negative values go left, positive right, 0 is neutral
+        /// <summary>
+        /// Sets the pan(left to right spinning)
+        /// </summary>
+        /// <param name="panVal">int from -128 to 127, 0 is neutral</param>
         public void setPan(int panVal)
         {
             if (panVal >= MIN_PAN && panVal <= MAX_PAN)
@@ -309,6 +377,10 @@ namespace DmxComm
         const int MAX_TILT = 127;
         const int TILT_CHANNEL = 10;
 
+        /// <summary>
+        /// Sets the tilt(up down motion).
+        /// </summary>
+        /// <param name="tiltVal">int from -128 to 127, 0 is neutral(pointing straight up)</param>
         public void setTilt(int tiltVal)
         {
             if (tiltVal >= MIN_TILT && tiltVal <= MAX_TILT)

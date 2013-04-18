@@ -16,6 +16,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
     using System.Collections;
     using Microsoft.Kinect;
     using System.Windows.Media.Imaging;
+    using System.Diagnostics;
     // Zachs DMX
     using DmxComm;
 
@@ -270,7 +271,14 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             if (null != this.sensor)
             {
                 // Turn on the skeleton stream to receive skeleton frames
-                this.sensor.SkeletonStream.Enable();
+                this.sensor.SkeletonStream.Enable(new TransformSmoothParameters()
+                {
+                    Smoothing = 0.5f,
+                    Correction = 0.5f,
+                    Prediction = 0.5f,
+                    JitterRadius = 0.05f,
+                    MaxDeviationRadius = 0.04f
+                });
 
                 // Add an event handler to be called whenever there is new color frame data
                 this.sensor.SkeletonFrameReady += this.SensorSkeletonFrameReady;
@@ -312,8 +320,8 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             }
         }
 
-        enum dynmodes {HAND_PAN_TILT, NONE};
-        private dynmodes currentDyanmicMode = dynmodes.NONE;
+        enum dynmodes {FOLLOW, HAND_PAN_TILT, NONE};
+        private dynmodes currentDyanmicMode = dynmodes.FOLLOW;
 
         /// <summary>
         /// Event handler for Kinect sensor's SkeletonFrameReady event
@@ -441,26 +449,140 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         }
         ArrayList xList = new ArrayList();
         ArrayList yList = new ArrayList();
+
+        Stopwatch stopwatch = new Stopwatch();
+
+        private void setNextDynamicMode(Skeleton skel)
+        {
+            var modes = (dynmodes[])Enum.GetValues(typeof(dynmodes));
+
+            for (int i = 0; i < modes.Length; i++)
+            {
+                if (modes[i] == currentDyanmicMode)
+                {
+                    if ((i + 1) == modes.Length)
+                    {
+                        currentDyanmicMode = modes[0];
+                        return;
+                    }
+                    else
+                    {
+                        currentDyanmicMode = modes[i + 1];
+                        return;
+                    }
+                }
+            }
+        }
+
+        private void setPrevDynamicMode(Skeleton skel)
+        {
+            var modes = (dynmodes[])Enum.GetValues(typeof(dynmodes));
+
+            for (int i = 0; i < modes.Length; i++)
+            {
+                if (modes[i] == currentDyanmicMode)
+                {
+                    if (i == 0)
+                    {
+                        currentDyanmicMode = modes[modes.Length - 1];
+                        return;
+                    }
+                    else
+                    {
+                        currentDyanmicMode = modes[i - 1];
+                        return;
+                    }
+                }
+            }
+        }
+
+
+        private void checkForModeSwitch(Skeleton skel)
+        {
+            
+            if (getDistanceJoints(skel.Joints[JointType.HandRight], skel.Joints[JointType.Head]) < 20)
+            {
+                if (stopwatch.IsRunning && stopwatch.ElapsedMilliseconds >= 1500)
+                {
+                    //switch mode
+                    setNextDynamicMode(skel);
+                }
+                else if(stopwatch.IsRunning == false)
+                {
+                    stopwatch.Start();
+                }
+
+            }
+            else if (getDistanceJoints(skel.Joints[JointType.HandLeft], skel.Joints[JointType.Head]) < 20)
+            {
+                if (stopwatch.IsRunning && stopwatch.ElapsedMilliseconds >= 1500)
+                {
+                    //switch mode
+                    setPrevDynamicMode(skel);
+                }
+                else if (stopwatch.IsRunning == false)
+                {
+                    stopwatch.Start();
+                }
+            }
+            else if (stopwatch.IsRunning)
+            {
+                //detected
+                stopwatch.Stop();
+                stopwatch.Reset();
+            }
+        
+        }
+
+        int calPanLeft = 0;
+        int calPanRight = 50;
+        Boolean calibrated = true;
+
+        private void dynamicFollowSkeleton(Skeleton skel)
+        {
+            //X position of the skeleton is a -1.0 to 1.0 value with 0 being the center of the kinect screen
+            // so at -1.0, we want setPan = calPanLeft, at 1.0, setPan= calPanRight, at 0 setPan = (left + right)/2.0f
+            if (!calibrated)
+            {
+                return;
+            }
+
+            float x = skel.Joints[JointType.HipCenter].Position.X;
+
+            if (x > 0)
+            {
+                dmxdev.setPan((int)(calPanLeft * x));
+            }
+            else
+            {
+                dmxdev.setPan((int)(calPanRight * x));
+            }
+
+
+        }
+        
         private void dynamicModeHandler(Skeleton skel)
         {
-            txtCapturedInfo.Text = "Distance from head Left:" + getDistanceJoints(skel.Joints[JointType.Head], skel.Joints[JointType.HandLeft]) + " Right:" + getDistanceJoints(skel.Joints[JointType.Head], skel.Joints[JointType.HandRight]);
-            currentDyanmicMode = dynmodes.HAND_PAN_TILT;
+            checkForModeSwitch(skel);
+            
             switch (currentDyanmicMode)
             {
+                case dynmodes.FOLLOW:
+                    dynamicFollowSkeleton(skel);
+                    break;
                 case dynmodes.HAND_PAN_TILT:
                     dmxdev.setLampOn();
-
-                    float dimmerLevel = skel.Joints[JointType.HandRight].Position.Y * 255;
+                    
+                    float dimmerLevel = skel.Joints[JointType.HandLeft].Position.Y * 255;
                     dmxdev.setDimmerLevel((int)dimmerLevel);
-
                     float panPos;
                     float tiltPos;
 
                     //Attempt at smoothing our data points, average position over 5 frames before calculating a new position
                     if (xList.Count < 5)
                     {
-                        xList.Add(skel.Joints[JointType.HandLeft].Position.X * 127);
-                        yList.Add(skel.Joints[JointType.HandLeft].Position.Y * 127);
+                        xList.Add(skel.Joints[JointType.HandRight].Position.X * 127);
+                        yList.Add(skel.Joints[JointType.HandRight].Position.Y * 127);
                         return;
                     }
                     else
