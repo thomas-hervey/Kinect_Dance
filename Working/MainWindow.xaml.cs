@@ -109,7 +109,8 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 
         }
 
-
+        // Focus value taken from the GUI slider
+        double focusValue;
 
 
         /* Static function variables */
@@ -290,10 +291,11 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                 this.statusBarText.Text = Properties.Resources.NoKinectReady;
             }
 
-            effectNamesArray[0] = "staticFunction1";
-            effectNamesArray[1] = "staticFunction2";
-            effectNamesArray[2] = "staticFunction3";
-            effectNamesArray[3] = "staticFunction4";
+            effectNamesArray[0] = "rightArmStatic";
+            effectNamesArray[1] = "leftArmStatic";
+            effectNamesArray[2] = "lungeKneeStatic";
+            effectNamesArray[3] = "vStatic";
+            effectNamesArray[4] = "defaultPose";
         }
 
         /// <summary>
@@ -1237,23 +1239,28 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         {
             // Static lighting effect 1
             if (matchedPose.lightingEffectName == effectNamesArray[0])
-            { 
-                staticFunction1();
+            {
+                rightArmStatic();
             }
             // Static lighting effect 2
             else if (matchedPose.lightingEffectName == effectNamesArray[1])
             {
-                staticFunction2();
+                leftArmStatic();
             }
             // Static lighting effect 3
             else if (matchedPose.lightingEffectName == effectNamesArray[2])
             {
-                staticFunction3();
+                lungeKneeStatic();
             }
             // Static lighting effect 4
             else if (matchedPose.lightingEffectName == effectNamesArray[3])
             {
-                staticFunction4();
+                vStatic();
+            }
+            // Static lighting effect 5
+            else if (matchedPose.lightingEffectName == effectNamesArray[4])
+            {
+                defaultPose();
             }
 
         }
@@ -1293,14 +1300,15 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         /// <param name="capturedPose"></param>
         /// <param name="currentSkel"></param>
         /// <returns> N/A </returns>
-        private void staticFunction1()
+        private void rightArmStatic()
         {
-            txtStatic.Text = ("Static Function 1");
+            txtDynamic.Text = ("right arm static");
+
             tempc += 1;
             dmxdev.setLampOn();
             dmxdev.setDimmerLevel((byte)(tempc & 0xff));
             dmxdev.setPan((byte)((tempc % 255) - 128));
-            dmxdev.setTilt((byte)((tempc % 255) - 128));
+            dmxdev.setTilt(110);
             dmxdev.setColorContinuous(DmxDriver.color_t.PINK);
          
         }
@@ -1311,16 +1319,15 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         /// <param name="capturedPose"></param>
         /// <param name="currentSkel"></param>
         /// <returns> N/A </returns>
-        private void staticFunction2()
+        private void leftArmStatic()
         {
-            txtStatic.Text = ("Static Function 2");
+            txtDynamic.Text = ("left arm static");
             tempc -= 1;
             dmxdev.setLampOn();
             dmxdev.setDimmerLevel((byte)(tempc & 0xff));
             dmxdev.setPan((byte)((tempc % 255) - 128));
-            dmxdev.setTilt((byte)((tempc % 255) - 128));
+            dmxdev.setTilt(110);
             dmxdev.setColorContinuous(DmxDriver.color_t.BLUE_101);
-            dmxdev.setGoboStandard(3);
             
         }
 
@@ -1330,15 +1337,21 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         /// <param name="capturedPose"></param>
         /// <param name="currentSkel"></param>
         /// <returns> N/A </returns>
-        private void staticFunction3()
+        private void lungeKneeStatic()
         {
-            txtStatic.Text = ("Static Function 3");
-            tempc -= 1;
+            txtDynamic.Text = ("lunge knee static");
+
+            dmxdev.clearGobo();
+            dmxdev.setPrismOff();
             dmxdev.setLampOn();
-            dmxdev.setDimmerLevel(255);
-            dmxdev.setColorContinuous(DmxDriver.color_t.WHITE);
-            dmxdev.setTilt(120);
-            dmxdev.setPan(90);
+            dmxdev.setDimmerLevel(200);
+            dmxdev.setFocus((int)focusValue);
+            txtSlider.Text = Convert.ToString(focusValue);
+            // possibly add threading for slow pannig
+            dmxdev.setColorContinuous(DmxDriver.color_t.GREEN_202);
+            dmxdev.shutterStrobe();
+
+            
 
         }
 
@@ -1348,19 +1361,46 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         /// <param name="capturedPose"></param>
         /// <param name="currentSkel"></param>
         /// <returns> N/A </returns>
-        private void staticFunction4()
+        private void vStatic()
         {
-            txtStatic.Text = ("Static Function 4");
-            tempc -= 1;
+            txtDynamic.Text = ("v static");
+
+            dmxdev.clearGobo();
+            dmxdev.setPrismOff();
             dmxdev.setLampOn();
             dmxdev.setDimmerLevel(255);
-            dmxdev.setColorContinuous(DmxDriver.color_t.WHITE);
-            dmxdev.setTilt(120);
-            dmxdev.setPan(90);
+            dmxdev.setFocus((int)focusValue);
+            txtSlider.Text = Convert.ToString(focusValue);
+
+            dmxdev.setTilt(0);
+            dmxdev.setColorContinuous(DmxDriver.color_t.RED);
+            dmxdev.setGoboStandard(7);
+            dmxdev.setPrismRotate(DmxDriver.rotation_direction_t.CW,10);
 
         }
 
+        /// <summary>
+        /// Ideal matched pose: 
+        /// </summary>
+        /// <param name="capturedPose"></param>
+        /// <param name="currentSkel"></param>
+        /// <returns> N/A </returns>
+        private void defaultPose()
+        {
+            txtDynamic.Text = ("default");
 
+            dmxdev.clearGobo();
+            dmxdev.setPrismOff();
+            dmxdev.setLampOn();
+            dmxdev.setDimmerLevel(100);
+            dmxdev.setFocus((int)focusValue);
+            txtSlider.Text = Convert.ToString(focusValue);
+
+            dmxdev.setColorContinuous(DmxDriver.color_t.WHITE);
+            dmxdev.setPan(-30);
+            dmxdev.setTilt(95);
+
+        }
 
 
 
@@ -1435,6 +1475,18 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             double yValuesSqrd = Math.Pow((y2 - y1), 2);
 
             return Math.Sqrt(xValuesSqrd + yValuesSqrd) * 100;
+        }
+
+        /// <summary>
+        /// Changes the focus of the light based on the slider position
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void focusSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+           focusValue = focusSlider.Value;
+           dmxdev.setFocus((int)focusValue);
+           txtSlider.Text = Convert.ToString(focusValue);
         }
 
     }
