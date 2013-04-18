@@ -388,5 +388,37 @@ namespace DmxComm
                 packet[TILT_CHANNEL + startAddr - 1] = (byte)(tiltVal + 128);
             }
         }
+
+
+        const int FINE_PAN_CHANNEL = 9;
+
+        /// <summary>
+        /// Alternative function to setPan, this takes a 16 bit signed integer 
+        /// valid range is -32,768 to +32,767
+        /// </summary>
+        /// <param name="panVal">integer from -32,768(full left) to +32,767(full right), 0 is neutral</param>
+        public void setPan16Bit(short panVal)
+        {
+            byte lsb = (byte)(panVal & 255);
+            byte msb = (byte)(panVal & (255 << 8));
+            packet[FINE_PAN_CHANNEL] = lsb;
+            packet[PAN_CHANNEL] = msb;
+
+        }
+
+        const int FINE_TILT_CHANNEL = 11;
+        /// <summary>
+        /// Alternative function to setTilt, this takes a 16bit signed integer
+        /// valid range is -32,768 to +32,767
+        /// </summary>
+        /// <param name="tiltVal">short that is -32,768 to +32,767, 0 being neutral</param>
+        public void setTilt16Bit(short tiltVal)
+        {
+            byte lsb = (byte)(tiltVal & 255);
+            byte msb = (byte)(tiltVal & (255 << 8));
+            packet[FINE_TILT_CHANNEL] = lsb;
+            packet[TILT_CHANNEL] = msb;
+        }
+
     }
 }
