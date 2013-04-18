@@ -401,8 +401,8 @@ namespace DmxComm
         {
             byte lsb = (byte)(panVal & 255);
             byte msb = (byte)(panVal & (255 << 8));
-            packet[FINE_PAN_CHANNEL] = lsb;
-            packet[PAN_CHANNEL] = msb;
+            packet[FINE_PAN_CHANNEL + startAddr - 1] = lsb;
+            packet[PAN_CHANNEL + startAddr - 1] = msb;
 
         }
 
@@ -416,8 +416,8 @@ namespace DmxComm
         {
             byte lsb = (byte)(tiltVal & 255);
             byte msb = (byte)(tiltVal & (255 << 8));
-            packet[FINE_TILT_CHANNEL] = lsb;
-            packet[TILT_CHANNEL] = msb;
+            packet[FINE_TILT_CHANNEL + startAddr - 1] = lsb;
+            packet[TILT_CHANNEL + startAddr - 1] = msb;
         }
 
     }
