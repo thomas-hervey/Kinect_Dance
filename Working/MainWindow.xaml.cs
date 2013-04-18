@@ -317,8 +317,8 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             }
         }
 
-        enum dynmodes {HAND_PAN_TILT, NONE};
-        private dynmodes currentDyanmicMode = dynmodes.NONE;
+        enum dynmodes {FOLLOW, HAND_PAN_TILT, NONE};
+        private dynmodes currentDyanmicMode = dynmodes.FOLLOW;
 
         /// <summary>
         /// Event handler for Kinect sensor's SkeletonFrameReady event
@@ -530,13 +530,43 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             }
         
         }
+
+        int calPanLeft = 0;
+        int calPanRight = 50;
+        Boolean calibrated = true;
+
+        private void dynamicFollowSkeleton(Skeleton skel)
+        {
+            //X position of the skeleton is a -1.0 to 1.0 value with 0 being the center of the kinect screen
+            // so at -1.0, we want setPan = calPanLeft, at 1.0, setPan= calPanRight, at 0 setPan = (left + right)/2.0f
+            if (!calibrated)
+            {
+                return;
+            }
+
+            float x = skel.Joints[JointType.HipCenter].Position.X;
+
+            if (x > 0)
+            {
+                dmxdev.setPan((int)(calPanLeft * x));
+            }
+            else
+            {
+                dmxdev.setPan((int)(calPanRight * x));
+            }
+
+
+        }
         
         private void dynamicModeHandler(Skeleton skel)
         {
+            checkForModeSwitch(skel);
             
-            currentDyanmicMode = dynmodes.HAND_PAN_TILT;
             switch (currentDyanmicMode)
             {
+                case dynmodes.FOLLOW:
+                    dynamicFollowSkeleton(skel);
+                    break;
                 case dynmodes.HAND_PAN_TILT:
                     dmxdev.setLampOn();
                     
