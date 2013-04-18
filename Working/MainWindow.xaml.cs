@@ -547,6 +547,8 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                 return;
             }
 
+            dmxdev.setShutterOpen();
+            dmxdev.setLampOn();
             float x = skel.Joints[JointType.HipCenter].Position.X;
 
             if (x > 0)
