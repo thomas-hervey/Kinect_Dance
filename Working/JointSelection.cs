@@ -115,7 +115,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                 {
                     if (((TextBox)t).Enabled == true)
                     {
-                        this.jointTolerances[i] = Convert.ToDouble(t.Text);
+                         this.jointTolerances[i] = Convert.ToDouble(t.Text);
                     }
                     else
                     {

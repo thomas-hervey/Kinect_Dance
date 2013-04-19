@@ -50,7 +50,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         // writePose counter
         private int numPosesWritten = 0;
         // array to hold the names of lighting effects (populates combobox in JSF)
-        public String[] effectNamesArray = new String[6];
+        public String[] effectNamesArray = new String[8];
         // Data to send off the image of the skeleton pose to JSF
         public ImageSource mainPoseImage;
         
@@ -296,6 +296,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             effectNamesArray[2] = "lungeKneeStatic";
             effectNamesArray[3] = "vStatic";
             effectNamesArray[4] = "defaultPose";
+            effectNamesArray[5] = "defaultSecondPerson";
         }
 
         /// <summary>
@@ -1262,6 +1263,10 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             {
                 defaultPose();
             }
+            else if (matchedPose.lightingEffectName == effectNamesArray[5])
+            {
+                defaultSecondPerson();
+            }
 
         }
 
@@ -1374,7 +1379,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 
             dmxdev.setTilt(0);
             dmxdev.setColorContinuous(DmxDriver.color_t.RED);
-            dmxdev.setGoboStandard(7);
+            dmxdev.setGoboStandard(8);
             dmxdev.setPrismRotate(DmxDriver.rotation_direction_t.CW,10);
 
         }
@@ -1397,8 +1402,25 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             txtSlider.Text = Convert.ToString(focusValue);
 
             dmxdev.setColorContinuous(DmxDriver.color_t.WHITE);
-            dmxdev.setPan(-30);
-            dmxdev.setTilt(95);
+            dmxdev.setPan(-20);
+            dmxdev.setTilt(-95);
+
+        }
+
+        private void defaultSecondPerson()
+        {
+            txtDynamic.Text = ("default second person");
+
+            dmxdev.clearGobo();
+            dmxdev.setPrismOff();
+            dmxdev.setLampOn();
+            dmxdev.setDimmerLevel(100);
+            dmxdev.setFocus((int)focusValue);
+            txtSlider.Text = Convert.ToString(focusValue);
+
+            dmxdev.setColorContinuous(DmxDriver.color_t.WHITE);
+            dmxdev.setPan(-35);
+            dmxdev.setTilt(-90);
 
         }
 
