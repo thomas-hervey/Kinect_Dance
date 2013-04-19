@@ -534,8 +534,8 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         
         }
 
-        int calPanLeft = 1;
-        int calPanRight = 50;
+        short centerPan = 0;
+        short range = 2600;
         Boolean calibrated = true;
 
         private void dynamicFollowSkeleton(Skeleton skel)
@@ -546,24 +546,13 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             {
                 return;
             }
-
+            dmxdev.setTilt(-85);
             dmxdev.setShutterOpen();
             dmxdev.setLampOn();
             dmxdev.setDimmerLevel(255);
             float hipX = skel.Joints[JointType.HipCenter].Position.X;
 
-            if (hipX > 0)
-            {
-                dmxdev.setPan((int)(calPanLeft * hipX));
-            }
-            else if (hipX < 0)
-            {
-                dmxdev.setPan((int)(calPanRight * hipX));
-            }
-            else
-            {
-                dmxdev.setPan((int)( (calPanRight + calPanLeft)/2.0) );
-            }
+            dmxdev.setPan16Bit((short)(centerPan + (range * hipX)));
 
             float rHandY = skel.Joints[JointType.HandRight].Position.Y;
 
