@@ -44,7 +44,7 @@ namespace DmxComm
             {
                 packet[i] = 0;
             }
-
+            packet[12 - 1 + startAddr] = 251;
             txThread = new Thread(() => sendData(packet, device));
             txThread.Start();
 

@@ -320,8 +320,8 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             }
         }
 
-        enum dynmodes {FOLLOW, HAND_PAN_TILT, NONE};
-        private dynmodes currentDyanmicMode = dynmodes.FOLLOW;
+        enum dynmodes {FOLLOW, HAND_PAN_TILT};
+        private dynmodes currentDyanmicMode = dynmodes.HAND_PAN_TILT;
 
         /// <summary>
         /// Event handler for Kinect sensor's SkeletonFrameReady event
@@ -502,10 +502,12 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             
             if (getDistanceJoints(skel.Joints[JointType.HandRight], skel.Joints[JointType.Head]) < 20)
             {
-                if (stopwatch.IsRunning && stopwatch.ElapsedMilliseconds >= 1500)
+                if (stopwatch.IsRunning && stopwatch.ElapsedMilliseconds >= 2000)
                 {
                     //switch mode
                     setNextDynamicMode(skel);
+                    stopwatch.Stop();
+                    stopwatch.Reset();
                 }
                 else if(stopwatch.IsRunning == false)
                 {
@@ -515,10 +517,12 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             }
             else if (getDistanceJoints(skel.Joints[JointType.HandLeft], skel.Joints[JointType.Head]) < 20)
             {
-                if (stopwatch.IsRunning && stopwatch.ElapsedMilliseconds >= 1500)
+                if (stopwatch.IsRunning && stopwatch.ElapsedMilliseconds >= 2000)
                 {
                     //switch mode
                     setPrevDynamicMode(skel);
+                    stopwatch.Stop();
+                    stopwatch.Reset();
                 }
                 else if (stopwatch.IsRunning == false)
                 {
@@ -536,16 +540,12 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 
         short centerPan = 0;
         short range = 2600;
-        Boolean calibrated = true;
-
+        
         private void dynamicFollowSkeleton(Skeleton skel)
         {
             //X position of the skeleton is a -1.0 to 1.0 value with 0 being the center of the kinect screen
             // so at -1.0, we want setPan = calPanLeft, at 1.0, setPan= calPanRight, at 0 setPan = (left + right)/2.0f
-            if (!calibrated)
-            {
-                return;
-            }
+            
             dmxdev.setTilt(-85);
             dmxdev.setShutterOpen();
             dmxdev.setLampOn();
@@ -606,8 +606,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                     dmxdev.setTilt((int)tiltPos);
 
                     break;
-                case dynmodes.NONE:
-                    break;
+                
             }
         }
 
