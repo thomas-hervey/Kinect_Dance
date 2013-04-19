@@ -534,7 +534,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         
         }
 
-        int calPanLeft = 0;
+        int calPanLeft = 1;
         int calPanRight = 50;
         Boolean calibrated = true;
 
@@ -549,6 +549,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 
             dmxdev.setShutterOpen();
             dmxdev.setLampOn();
+            dmxdev.setDimmerLevel(255);
             float hipX = skel.Joints[JointType.HipCenter].Position.X;
 
             if (hipX > 0)
@@ -564,6 +565,16 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                 dmxdev.setPan((int)( (calPanRight + calPanLeft)/2.0) );
             }
 
+            float rHandY = skel.Joints[JointType.HandRight].Position.Y;
+
+            if (rHandY > 0.5)
+            {
+                dmxdev.setNextColor();
+            }
+            else if (rHandY < -0.5)
+            {
+                dmxdev.setPrevColor();
+            }
 
         }
         

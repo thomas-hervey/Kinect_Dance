@@ -150,14 +150,13 @@ namespace DmxComm
 
         public enum color_t { WHITE = 0, CTC = 12, YELLOW = 24, BLUE_104 = 36, PINK = 48, GREEN_206 = 60, BLUE_108 = 72, RED = 84, MAGENTA = 96, BLUE_101 = 108, GREEN_202 = 132, PURPLE = 144 };
 
+        const int COLOR_CHANNEL = 3;
         /// <summary>
         /// Function sets a color on the DMX light
         /// </summary>
         /// <param name="c">Enumerated type color_t</param>
         public void setColorContinuous(color_t c)
         {
-            int COLOR_CHANNEL = 3;
-
 
             switch (c)
             {
@@ -176,6 +175,50 @@ namespace DmxComm
                 case color_t.PURPLE:
                     packet[startAddr + COLOR_CHANNEL - 1] = (byte)c;
                     break;
+            }
+        }
+
+        /// <summary>
+        /// Convienence function that allows one to programmatically iterate over the colors
+        /// </summary>
+        public void setNextColor()
+        {
+            var colors = (color_t[])Enum.GetValues(typeof(color_t));
+            for (int i = 0; i < colors.Length; i++)
+            {
+                if ((byte)colors[i] == packet[startAddr + COLOR_CHANNEL - 1])
+                {
+                    if (i + 1 < colors.Length)
+                    {
+                        packet[startAddr + COLOR_CHANNEL - 1] = (byte)colors[i + 1];
+                    }
+                    else
+                    {
+                        packet[startAddr + COLOR_CHANNEL - 1] = (byte)colors[0];
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Convienence function that allows one to programmatically iterate over the colors
+        /// </summary>
+        public void setPrevColor()
+        {
+            var colors = (color_t[])Enum.GetValues(typeof(color_t));
+            for (int i = 0; i < colors.Length; i++)
+            {
+                if ((byte)colors[i] == packet[startAddr + COLOR_CHANNEL - 1])
+                {
+                    if (i == 0)
+                    {
+                        packet[startAddr + COLOR_CHANNEL - 1] = (byte)colors[colors.Length - 1];
+                    }
+                    else
+                    {
+                        packet[startAddr + COLOR_CHANNEL - 1] = (byte)colors[i - 1];
+                    }
+                }
             }
         }
 
@@ -399,8 +442,10 @@ namespace DmxComm
         /// <param name="panVal">integer from -32,768(full left) to +32,767(full right), 0 is neutral</param>
         public void setPan16Bit(short panVal)
         {
-            byte lsb = (byte)(panVal & 255);
-            byte msb = (byte)(panVal & (255 << 8));
+            ushort unsignedPan = (ushort)(panVal + (short.MinValue * -1));
+            byte lsb = (byte)(unsignedPan & 255);
+            byte msb = (byte)((unsignedPan & (255 << 8)) >> 8);
+
             packet[FINE_PAN_CHANNEL + startAddr - 1] = lsb;
             packet[PAN_CHANNEL + startAddr - 1] = msb;
 
@@ -414,8 +459,10 @@ namespace DmxComm
         /// <param name="tiltVal">short that is -32,768 to +32,767, 0 being neutral</param>
         public void setTilt16Bit(short tiltVal)
         {
-            byte lsb = (byte)(tiltVal & 255);
-            byte msb = (byte)(tiltVal & (255 << 8));
+            ushort unsignedTilt = (ushort)(tiltVal + (short.MinValue * -1));
+            byte lsb = (byte)(unsignedTilt & 255);
+            byte msb = (byte)((unsignedTilt & (255 << 8)) >> 8);
+
             packet[FINE_TILT_CHANNEL + startAddr - 1] = lsb;
             packet[TILT_CHANNEL + startAddr - 1] = msb;
         }
