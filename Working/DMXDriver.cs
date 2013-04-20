@@ -15,8 +15,10 @@ namespace DmxComm
         private bool connected;
         private FTDI device;
         private int startAddr;
+        
         Thread txThread;
-        static volatile bool running = true;
+
+        static volatile bool dataThreadRunning = true;
 
         private byte[] packet;
         /// <summary>
@@ -74,6 +76,8 @@ namespace DmxComm
             return connected;
         }
 
+
+
         /// <summary>
         /// Stops the device
         /// </summary>
@@ -86,7 +90,7 @@ namespace DmxComm
             }
             //give the send data cycle a chance to die
             Thread.Sleep(50);
-            running = false;
+            dataThreadRunning = false;
         }
 
         /// <summary>
@@ -99,7 +103,7 @@ namespace DmxComm
             //device.SetBreak(false);
             //System.Threading.Thread.Sleep(40);
             //device.SetBreak(true);
-            while (running)
+            while (dataThreadRunning)
             {
                 uint written = 0;
                 FTDI.FT_STATUS result;
@@ -469,6 +473,10 @@ namespace DmxComm
             packet[FINE_TILT_CHANNEL + startAddr - 1] = lsb;
             packet[TILT_CHANNEL + startAddr - 1] = msb;
         }
+
+        static volatile bool effectThreadRunning = false;
+        Thread effectThread = null;
+
 
     }
 }
