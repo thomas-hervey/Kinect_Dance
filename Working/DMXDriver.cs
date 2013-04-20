@@ -358,6 +358,22 @@ namespace DmxComm
         const int MIN_FOCUS = 0;
         const int FOCUS_CHANNEL = 6;
 
+        /// <summary>
+        /// Sets the gobo speed
+        /// </summary>
+        public void setGoboSpin(rotation_direction_t direction, int intensity)
+        {
+            if (direction == rotation_direction_t.CCW)
+            {
+                packet[GOBO_CHANNEL + startAddr - 1] = (byte)(intensity + 210);
+            }
+            else if (direction == rotation_direction_t.CW)
+            {
+                packet[GOBO_CHANNEL + startAddr - 1] = (byte)(255 - intensity);
+            }
+            //else not a valid direction
+        }
+
         //focus 0 = infinity, 255 = 2 meters
 
         /// <summary>
@@ -391,10 +407,10 @@ namespace DmxComm
         /// <param name="intensity">int from 0-59, 59 being max rotate speed</param>
         public void setPrismRotate(rotation_direction_t direction, int intensity)
         {
-            int temp;
+            //int temp;
             if (direction == rotation_direction_t.CCW)
             {
-                packet[PRISM_CHANNEL + startAddr - 1] = (byte)(intensity + 20);
+                packet[PRISM_CHANNEL + startAddr - 1] = (byte)(79 - intensity);
             }
             else if (direction == rotation_direction_t.CW)
             {
