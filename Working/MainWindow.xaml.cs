@@ -327,7 +327,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 
         }
 
-        enum dynmodes {FOLLOW, HAND_PAN_TILT};
+        enum dynmodes {FOLLOW, HAND_PAN_TILT, GOBO_SPIN};
         private dynmodes currentDyanmicMode = dynmodes.HAND_PAN_TILT;
 
         /// <summary>
@@ -456,6 +456,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             dmxdev.setShutterOpen();
             dmxdev.setLampOn();
             dmxdev.setDimmerLevel(255);
+            dmxdev.setColorContinuous(DmxDriver.color_t.WHITE);
             float hipX = skel.Joints[JointType.HipCenter].Position.X;
 
             dmxdev.setPan16Bit((short)(centerPan + (range * hipX)));
@@ -1333,7 +1334,8 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             // possibly add threading for slow pannig
             dmxdev.setColorContinuous(DmxDriver.color_t.GREEN_202);
             dmxdev.shutterStrobe();
-
+            dmxdev.setPan(-20);
+            dmxdev.setTilt(-95);
             
 
         }
@@ -1357,7 +1359,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 
             dmxdev.setTilt(0);
             dmxdev.setColorContinuous(DmxDriver.color_t.RED);
-            dmxdev.setGoboStandard(8);
+            dmxdev.setGoboStandard(5);
             dmxdev.setPrismRotate(DmxDriver.rotation_direction_t.CW,10);
 
         }
@@ -1424,9 +1426,18 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                     txtDynamic.Text = "Dynamic:  Follow";
                     dynamicFollowSkeleton(skel);
                     break;
+                /*case dynmodes.GOBO_SPIN:
+                    txtDynamic.Text = "Dynamic:  Gobo Spin";
+                    dynamicGoboSpin(skel);
+                    break;*/
                 case dynmodes.HAND_PAN_TILT:
+                    
                     txtDynamic.Text = "Dynamic:  Hand Pan Tilt";
+                    
+                    dmxdev.clearGobo();
+                    dmxdev.setShutterOpen();
                     dmxdev.setLampOn();
+                    dmxdev.setColorContinuous(DmxDriver.color_t.BLUE_101);
 
                     float dimmerLevel = skel.Joints[JointType.HandLeft].Position.Y * 255;
                     dmxdev.setDimmerLevel((int)dimmerLevel);
@@ -1586,7 +1597,34 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         short centerPan = 0;
         short range = 2600;
 
-
+        /// <summary>
+        /// Dynamic sub-mode: User spins gobo 
+        /// </summary>
+        /// <param name="skel"></param>
+        /// <returns> N/A </returns>
+        private void dynamicGoboSpin(Skeleton skel)
+        {
+            dmxdev.clearGobo();
+            dmxdev.setShutterOpen();
+            dmxdev.setLampOn();
+            dmxdev.setGoboStandard(2);
+            dmxdev.setColorContinuous(DmxDriver.color_t.GREEN_202);
+            float rightHandX = skel.Joints[JointType.HandRight].Position.X * 127;
+            float rightHandY = skel.Joints[JointType.HandRight].Position.Y * 127;
+            dmxdev.setPan((int)rightHandX);
+            dmxdev.setTilt((int)rightHandY);
+            
+            float goboSpin = skel.Joints[JointType.HandLeft].Position.Y * 127;
+            if (goboSpin > 0)
+            {
+                dmxdev.setGoboSpin((DmxComm.DmxDriver.rotation_direction_t.CW),(int)goboSpin);
+            }
+            else if (goboSpin < 0)
+            {
+                dmxdev.setGoboSpin((DmxComm.DmxDriver.rotation_direction_t.CCW),(int)goboSpin);
+            }
+      
+        }
 
         /* *****TEST FUNCTIONS***** */
 
