@@ -540,7 +540,8 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 
         short centerPan = 0;
         short range = 2600;
-        
+
+        Stopwatch colorIterateTimer = new Stopwatch();
         private void dynamicFollowSkeleton(Skeleton skel)
         {
             //X position of the skeleton is a -1.0 to 1.0 value with 0 being the center of the kinect screen
@@ -558,11 +559,29 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 
             if (rHandY > 0.5)
             {
-                dmxdev.setNextColor();
+                if (colorIterateTimer.IsRunning == false)
+                {
+                    colorIterateTimer.Start();
+                }
+                else if (colorIterateTimer.ElapsedMilliseconds > 1000)
+                {
+                    dmxdev.setNextColor();
+                    colorIterateTimer.Stop();
+                    colorIterateTimer.Reset();
+                }                
             }
             else if (rHandY < -0.5)
             {
-                dmxdev.setPrevColor();
+                if (colorIterateTimer.IsRunning == false)
+                {
+                    colorIterateTimer.Start();
+                }
+                else if (colorIterateTimer.ElapsedMilliseconds > 1000)
+                {
+                    dmxdev.setPrevColor();
+                    colorIterateTimer.Stop();
+                    colorIterateTimer.Reset();
+                }                
             }
 
         }
