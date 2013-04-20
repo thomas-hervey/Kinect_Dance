@@ -62,13 +62,6 @@ namespace DmxComm
 
         ~DmxDriver()
         {
-            //return to a 0'ed mode on exit
-            for (int i = 0; i < DMX_PACKET_SIZE; i++)
-            {
-                packet[i] = 0;
-            }
-            Thread.Sleep(50);
-            this.stop();
             device.Close();
         }
 
@@ -86,10 +79,14 @@ namespace DmxComm
         /// </summary>
         public void stop()
         {
-            running = false;
+            //return to a 0'ed mode on exit
+            for (int i = 0; i < DMX_PACKET_SIZE; i++)
+            {
+                packet[i] = 0;
+            }
             //give the send data cycle a chance to die
             Thread.Sleep(50);
-            device.Close();
+            running = false;
         }
 
         /// <summary>
@@ -178,6 +175,7 @@ namespace DmxComm
             }
         }
 
+
         /// <summary>
         /// Convienence function that allows one to programmatically iterate over the colors
         /// </summary>
@@ -188,13 +186,16 @@ namespace DmxComm
             {
                 if ((byte)colors[i] == packet[startAddr + COLOR_CHANNEL - 1])
                 {
+
                     if (i + 1 < colors.Length)
                     {
                         packet[startAddr + COLOR_CHANNEL - 1] = (byte)colors[i + 1];
+                        return;
                     }
                     else
                     {
                         packet[startAddr + COLOR_CHANNEL - 1] = (byte)colors[0];
+                        return;
                     }
                 }
             }
@@ -213,10 +214,12 @@ namespace DmxComm
                     if (i == 0)
                     {
                         packet[startAddr + COLOR_CHANNEL - 1] = (byte)colors[colors.Length - 1];
+                        return;
                     }
                     else
                     {
                         packet[startAddr + COLOR_CHANNEL - 1] = (byte)colors[i - 1];
+                        return;
                     }
                 }
             }

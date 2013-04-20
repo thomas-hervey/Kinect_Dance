@@ -445,6 +445,51 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             }
         }
 
+
+        Stopwatch colorIterateTimer = new Stopwatch();
+        private void dynamicFollowSkeleton(Skeleton skel)
+        {
+            //X position of the skeleton is a -1.0 to 1.0 value with 0 being the center of the kinect screen
+            // so at -1.0, we want setPan = calPanLeft, at 1.0, setPan= calPanRight, at 0 setPan = (left + right)/2.0f
+            
+            dmxdev.setTilt(-85);
+            dmxdev.setShutterOpen();
+            dmxdev.setLampOn();
+            dmxdev.setDimmerLevel(255);
+            float hipX = skel.Joints[JointType.HipCenter].Position.X;
+
+            dmxdev.setPan16Bit((short)(centerPan + (range * hipX)));
+
+            float rHandY = skel.Joints[JointType.HandRight].Position.Y;
+
+            if (rHandY > 0.5)
+            {
+                if (colorIterateTimer.IsRunning == false)
+                {
+                    colorIterateTimer.Start();
+                }
+                else if (colorIterateTimer.ElapsedMilliseconds > 1000)
+                {
+                    dmxdev.setNextColor();
+                    colorIterateTimer.Stop();
+                    colorIterateTimer.Reset();
+                }                
+                if (colorIterateTimer.IsRunning == false)
+                {
+                    colorIterateTimer.Start();
+                }
+                else if (colorIterateTimer.ElapsedMilliseconds > 1000)
+                {
+                    dmxdev.setPrevColor();
+                    colorIterateTimer.Stop();
+                    colorIterateTimer.Reset();
+                }                
+            }
+
+        }
+        
+
+
         /// <summary>
         /// Draws a skeleton's bones and joints
         /// </summary>
@@ -1540,34 +1585,6 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         /// <returns> N/A </returns>
         short centerPan = 0;
         short range = 2600;
-        private void dynamicFollowSkeleton(Skeleton skel)
-        {
-            //X position of the skeleton is a -1.0 to 1.0 value with 0 being the center of the kinect screen
-            // so at -1.0, we want setPan = calPanLeft, at 1.0, setPan= calPanRight, at 0 setPan = (left + right)/2.0f
-
-            dmxdev.setTilt(-85);
-            dmxdev.setShutterOpen();
-            dmxdev.setLampOn();
-            dmxdev.setDimmerLevel(255);
-            float hipX = skel.Joints[JointType.HipCenter].Position.X;
-
-            dmxdev.setPan16Bit((short)(centerPan + (range * hipX)));
-
-            float rHandY = skel.Joints[JointType.HandRight].Position.Y;
-
-            if (rHandY > 0.5)
-            {
-                dmxdev.setNextColor();
-            }
-            else if (rHandY < -0.5)
-            {
-                dmxdev.setPrevColor();
-            }
-
-        }
-
-
-
 
 
 
