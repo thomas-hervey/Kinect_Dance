@@ -92,9 +92,9 @@
         				</TransformGroup>
         			</TextBox.RenderTransform></TextBox>
         	</InlineUIContainer></TextBlock>
-        <Slider x:Name="focusSlider" Margin="415,16,182,30" Maximum="255" Cursor="Arrow" ValueChanged="focusSlider_ValueChanged"/>
-        <TextBox x:Name="txtDynamic" TextWrapping="Wrap" Margin="415,43,132,2" Background="#FF515151" Foreground="White" IsReadOnly="True"/>
-        <GroupBox x:Name="functionMode" Header="Function Mode" Margin="619,-2,12,2" FontWeight="Bold">
+        <Slider x:Name="focusSlider" Margin="415,16,182,30" Maximum="255" Cursor="Arrow" ValueChanged="focusSlider_ValueChanged" Width="145" Height="22"/>
+        <TextBox x:Name="txtDynamic" TextWrapping="Wrap" Margin="415,43,132,2" Background="#FF515151" Foreground="White" IsReadOnly="True" Width="208" Height="23"/>
+        <GroupBox x:Name="functionMode" Header="Function Mode" Margin="619,-2,12,2" FontWeight="Bold" Width="111" Height="68">
             <WrapPanel HorizontalAlignment="Left" Height="46" VerticalAlignment="Top" Width="96" Margin="0,0,0,-1">
                 <RadioButton x:Name="captureMode" Content="Capture Mode" Checked="captureMode_Checked" Height="18" Width="96" IsChecked="True" Cursor="Hand" RenderTransformOrigin="0.5,0.5" FontWeight="Normal"/>
                 <RadioButton x:Name="staticMode" Content="Static Mode" Checked="staticMode_Checked" Cursor="Hand" Height="16" RenderTransformOrigin="0.5,0.5" FontWeight="Normal">
