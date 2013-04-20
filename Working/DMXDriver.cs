@@ -178,6 +178,7 @@ namespace DmxComm
             }
         }
 
+
         /// <summary>
         /// Convienence function that allows one to programmatically iterate over the colors
         /// </summary>
@@ -188,13 +189,16 @@ namespace DmxComm
             {
                 if ((byte)colors[i] == packet[startAddr + COLOR_CHANNEL - 1])
                 {
+
                     if (i + 1 < colors.Length)
                     {
                         packet[startAddr + COLOR_CHANNEL - 1] = (byte)colors[i + 1];
+                        return;
                     }
                     else
                     {
                         packet[startAddr + COLOR_CHANNEL - 1] = (byte)colors[0];
+                        return;
                     }
                 }
             }
@@ -213,10 +217,12 @@ namespace DmxComm
                     if (i == 0)
                     {
                         packet[startAddr + COLOR_CHANNEL - 1] = (byte)colors[colors.Length - 1];
+                        return;
                     }
                     else
                     {
                         packet[startAddr + COLOR_CHANNEL - 1] = (byte)colors[i - 1];
+                        return;
                     }
                 }
             }
