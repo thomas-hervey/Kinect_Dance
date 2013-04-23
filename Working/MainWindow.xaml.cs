@@ -412,7 +412,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                             }
                             else if (CurrentMode == mode.DynamicMode)
                             {
-                                dynamicModeHandler(skel);                        
+                                dynamicModeHandler(skel);
 
                             }
 
@@ -437,6 +437,21 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                             BodyCenterThickness,
                             BodyCenterThickness);
                         }
+                    }
+                }
+                else
+                {
+
+                    if (dmxdev.isEffectThreadRunning())
+                    {
+                        //do nothing?
+                    }
+                    else
+                    {
+                        dmxdev.setShutterOpen();
+                        dmxdev.setDimmerLevel(125);
+                        dmxdev.setColorContinuous(DmxDriver.color_t.BLUE_101);
+                        dmxdev.threadedScanEffect(-1300, 1300, 1);
                     }
                 }
 
@@ -905,7 +920,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 
             // Open file dialog to pick a save location
             SaveFileDialog saveFileDiag = new SaveFileDialog();
-
+            saveFileDiag.Filter = "Text File (*.txt)|*.txt";
             // If the file dialog works...
             if (saveFileDiag.ShowDialog() == System.Windows.Forms.DialogResult.OK)
             {
@@ -949,6 +964,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         {
             // Open file dialog to get the pose text to open
             OpenFileDialog openFile = new OpenFileDialog();
+            openFile.Filter = "Text File (*.txt)|*.txt";
             DialogResult result = openFile.ShowDialog();
             String filePath = "";
             filePath = openFile.FileName;
@@ -995,8 +1011,9 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             numPosesLoaded++;
 
             // User feedback once pose is loaded
-            txtCapturedInfo.Text += Convert.ToString("Added a new pose with the effect: " + poseToFill.lightingEffectName + "\n");
-            txtCapturedInfo.Text += Convert.ToString("Total number of loaded poses: " + numPosesLoaded);
+            String poseLoadInfoString = "Added a new pose with effect: " + poseToFill.lightingEffectName + "\n" +
+                "Total number of loaded poses: " + numPosesLoaded;
+            txtCapturedInfo.Text = poseLoadInfoString;
 
             streamReader.Close();
             openFile.Dispose();
@@ -1287,13 +1304,23 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         private void rightArmStatic()
         {
             txtDynamic.Text = ("Static:  right arm static");
-
+            if (!dmxdev.isEffectThreadRunning())
+            {
+                dmxdev.threadedScanEffect();
+            }
+            
+            dmxdev.setColorContinuous(DmxDriver.color_t.PINK);
+            dmxdev.setGoboStandard(5);
+            dmxdev.setPrismRotate(DmxDriver.rotation_direction_t.CW, 10);
+            dmxdev.setShutterOpen();
+            /*
             tempc += 1;
             dmxdev.setLampOn();
             dmxdev.setDimmerLevel((byte)(tempc & 0xff));
             dmxdev.setPan((byte)((tempc % 255) - 128));
             dmxdev.setTilt(110);
             dmxdev.setColorContinuous(DmxDriver.color_t.PINK);
+             */
          
         }
 
@@ -1306,12 +1333,22 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         private void leftArmStatic()
         {
             txtDynamic.Text = ("Static:  left arm static");
+            if (!dmxdev.isEffectThreadRunning())
+            {
+                dmxdev.threadedScanEffect();
+            }
+            dmxdev.setColorContinuous(DmxDriver.color_t.BLUE_101);
+            dmxdev.setGoboStandard(5);
+            dmxdev.setPrismRotate(DmxDriver.rotation_direction_t.CW, 10);
+            dmxdev.setShutterOpen();
+            /*
             tempc -= 1;
             dmxdev.setLampOn();
             dmxdev.setDimmerLevel((byte)(tempc & 0xff));
             dmxdev.setPan((byte)((tempc % 255) - 128));
             dmxdev.setTilt(110);
             dmxdev.setColorContinuous(DmxDriver.color_t.BLUE_101);
+             */
             
         }
 
@@ -1323,6 +1360,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         /// <returns> N/A </returns>
         private void lungeKneeStatic()
         {
+            dmxdev.endEffectThread();
             txtDynamic.Text = ("Static:  lunge knee static");
 
             dmxdev.clearGobo();
@@ -1334,8 +1372,8 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             // possibly add threading for slow pannig
             dmxdev.setColorContinuous(DmxDriver.color_t.GREEN_202);
             dmxdev.shutterStrobe();
-            dmxdev.setPan(-20);
-            dmxdev.setTilt(-95);
+            dmxdev.setPan(-13);
+            dmxdev.setTilt(-80);
             
 
         }
@@ -1348,8 +1386,10 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         /// <returns> N/A </returns>
         private void vStatic()
         {
+            dmxdev.endEffectThread();
             txtDynamic.Text = ("Static:  v static");
 
+            dmxdev.setShutterOpen();
             dmxdev.clearGobo();
             dmxdev.setPrismOff();
             dmxdev.setLampOn();
@@ -1357,7 +1397,8 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             dmxdev.setFocus((int)focusValue);
             txtSlider.Text = Convert.ToString(focusValue);
 
-            dmxdev.setTilt(0);
+            dmxdev.setTilt(-70);
+            dmxdev.setPan(-20);
             dmxdev.setColorContinuous(DmxDriver.color_t.RED);
             dmxdev.setGoboStandard(5);
             dmxdev.setPrismRotate(DmxDriver.rotation_direction_t.CW,10);
@@ -1372,8 +1413,29 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         /// <returns> N/A </returns>
         private void defaultPose()
         {
+            dmxdev.endEffectThread();
             txtDynamic.Text = ("Static:  default");
 
+            dmxdev.setShutterOpen();
+            dmxdev.clearGobo();
+            dmxdev.setPrismOff();
+            dmxdev.setLampOn();
+            dmxdev.setDimmerLevel(100);
+            dmxdev.setFocus((int)focusValue);
+            txtSlider.Text = Convert.ToString(focusValue);
+
+            dmxdev.setColorContinuous(DmxDriver.color_t.WHITE);
+            dmxdev.setPan(-12);
+            dmxdev.setTilt(-80);
+
+        }
+
+        private void defaultSecondPerson()
+        {
+            dmxdev.endEffectThread();
+            txtDynamic.Text = ("Static:  default second person");
+
+            dmxdev.setShutterOpen();
             dmxdev.clearGobo();
             dmxdev.setPrismOff();
             dmxdev.setLampOn();
@@ -1383,24 +1445,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 
             dmxdev.setColorContinuous(DmxDriver.color_t.WHITE);
             dmxdev.setPan(-20);
-            dmxdev.setTilt(-95);
-
-        }
-
-        private void defaultSecondPerson()
-        {
-            txtDynamic.Text = ("Static:  default second person");
-
-            dmxdev.clearGobo();
-            dmxdev.setPrismOff();
-            dmxdev.setLampOn();
-            dmxdev.setDimmerLevel(100);
-            dmxdev.setFocus((int)focusValue);
-            txtSlider.Text = Convert.ToString(focusValue);
-
-            dmxdev.setColorContinuous(DmxDriver.color_t.WHITE);
-            dmxdev.setPan(-35);
-            dmxdev.setTilt(-90);
+            dmxdev.setTilt(-82);
 
         }
 
@@ -1418,6 +1463,10 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         /// <returns> N/A </returns>
         private void dynamicModeHandler(Skeleton skel)
         {
+            if (dmxdev.isEffectThreadRunning())
+            {
+                dmxdev.endEffectThread();
+            }
             checkForModeSwitch(skel);
 
             switch (currentDyanmicMode)
@@ -1445,25 +1494,32 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                     float tiltPos;
 
                     //Attempt at smoothing our data points, average position over 5 frames before calculating a new position
-                    if (xList.Count < 5)
-                    {
-                        xList.Add(skel.Joints[JointType.HandRight].Position.X * 127);
-                        yList.Add(skel.Joints[JointType.HandRight].Position.Y * 127);
-                        return;
-                    }
-                    else
-                    {
-                        panPos = getAverage(xList);
-                        tiltPos = getAverage(yList);
-                        xList.Clear();
-                        yList.Clear();
-                    }
+                    //if (xList.Count < 5)
+                    //{
+                    //    xList.Add(skel.Joints[JointType.HandRight].Position.X * 127);
+                    //    yList.Add(skel.Joints[JointType.HandRight].Position.Y * 127);
+                    //    return;
+                    //}
+                    //else
+                    //{
+                    //    panPos = getAverage(xList);
+                    //    tiltPos = getAverage(yList);
+                    //    xList.Clear();
+                    //    yList.Clear();
+                    //}
 
+
+
+                    panPos = skel.Joints[JointType.HandRight].Position.X * short.MaxValue;
+                    tiltPos = skel.Joints[JointType.HandRight].Position.Y * short.MaxValue;
                     //double jointDistance = getDistanceJoints(skel.Joints[JointType.HandLeft], skel.Joints[JointType.HandRight]);
                     //txtCapturedInfo.Text = "Left Hand X:" + (int)(skel.Joints[JointType.HandLeft].Position.X * 127);
 
-                    dmxdev.setPan((int)panPos);
-                    dmxdev.setTilt((int)tiltPos);
+                    //dmxdev.setPan((int)panPos);
+                    //dmxdev.setTilt((int)tiltPos);
+
+                    dmxdev.setPan16Bit((short)panPos);
+                    dmxdev.setTilt16Bit((short)tiltPos);
 
                     break;
 

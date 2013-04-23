@@ -15,7 +15,7 @@ namespace DmxComm
         private bool connected;
         private FTDI device;
         private int startAddr;
-        
+
         Thread txThread;
 
         static volatile bool dataThreadRunning = true;
@@ -119,11 +119,13 @@ namespace DmxComm
 
                 //Console.WriteLine(result);
                 //Console.WriteLine(written);
-
-                packet[0] = 0;
-                result = device.Write(packet, 16, ref written);//send data array
-                //Console.WriteLine(result);
-                //Console.WriteLine(written);
+                lock (packet)
+                {
+                    packet[0] = 0;
+                    result = device.Write(packet, 16, ref written);//send data array
+                    //Console.WriteLine(result);
+                    //Console.WriteLine(written);
+                }
 
 
                 byte[] endcode = new byte[1];
@@ -141,7 +143,11 @@ namespace DmxComm
         public void shutterStrobe()
         {
             int DMX_STROBE_CHANNEL = 1;
-            packet[startAddr + DMX_STROBE_CHANNEL - 1] = 72;
+
+            lock (packet)
+            {
+                packet[startAddr + DMX_STROBE_CHANNEL - 1] = 72;
+            }
 
         }
 
@@ -174,7 +180,10 @@ namespace DmxComm
                 case color_t.BLUE_101:
                 case color_t.GREEN_202:
                 case color_t.PURPLE:
-                    packet[startAddr + COLOR_CHANNEL - 1] = (byte)c;
+                    lock (packet)
+                    {
+                        packet[startAddr + COLOR_CHANNEL - 1] = (byte)c;
+                    }
                     break;
             }
         }
@@ -193,12 +202,18 @@ namespace DmxComm
 
                     if (i + 1 < colors.Length)
                     {
-                        packet[startAddr + COLOR_CHANNEL - 1] = (byte)colors[i + 1];
+                        lock (packet)
+                        {
+                            packet[startAddr + COLOR_CHANNEL - 1] = (byte)colors[i + 1];
+                        }
                         return;
                     }
                     else
                     {
-                        packet[startAddr + COLOR_CHANNEL - 1] = (byte)colors[0];
+                        lock (packet)
+                        {
+                            packet[startAddr + COLOR_CHANNEL - 1] = (byte)colors[0];
+                        }
                         return;
                     }
                 }
@@ -217,12 +232,19 @@ namespace DmxComm
                 {
                     if (i == 0)
                     {
-                        packet[startAddr + COLOR_CHANNEL - 1] = (byte)colors[colors.Length - 1];
+                        lock (packet)
+                        {
+                            packet[startAddr + COLOR_CHANNEL - 1] = (byte)colors[colors.Length - 1];
+                        }
+
                         return;
                     }
                     else
                     {
-                        packet[startAddr + COLOR_CHANNEL - 1] = (byte)colors[i - 1];
+                        lock (packet)
+                        {
+                            packet[startAddr + COLOR_CHANNEL - 1] = (byte)colors[i - 1];
+                        }
                         return;
                     }
                 }
@@ -251,8 +273,10 @@ namespace DmxComm
                     temp = 168;
                     break;
             }
-
-            packet[startAddr + STROBE_CHANNEL - 1] = temp;
+            lock (packet)
+            {
+                packet[startAddr + STROBE_CHANNEL - 1] = temp;
+            }
         }
 
         /// <summary>
@@ -267,7 +291,10 @@ namespace DmxComm
                 case speed_t.FAST:
                 case speed_t.MEDIUM:
                 case speed_t.SLOW:
-                    packet[COLOR_CHANNEL + startAddr - 1] = (byte)speed;
+                    lock (packet)
+                    {
+                        packet[COLOR_CHANNEL + startAddr - 1] = (byte)speed;
+                    }
                     break;
             }
         }
@@ -279,8 +306,11 @@ namespace DmxComm
         {
             int DMX_LAMP_ON = 237;
             int LAMP_ON_CHANNEL = 1;
+            lock (packet)
+            {
+                packet[startAddr + LAMP_ON_CHANNEL - 1] = (byte)DMX_LAMP_ON;
+            }
 
-            packet[startAddr + LAMP_ON_CHANNEL - 1] = (byte)DMX_LAMP_ON;
         }
 
         /// <summary>
@@ -290,8 +320,11 @@ namespace DmxComm
         {
             int DMX_LAMP_OFF = 254;
             int DMX_LAMP_OFF_CHANNEL = 1;
+            lock (packet)
+            {
+                packet[startAddr + DMX_LAMP_OFF_CHANNEL - 1] = (byte)DMX_LAMP_OFF;
+            }
 
-            packet[startAddr + DMX_LAMP_OFF_CHANNEL - 1] = (byte)DMX_LAMP_OFF;
         }
 
         /// <summary>
@@ -301,8 +334,11 @@ namespace DmxComm
         {
             int DMX_SHUTTER_OPEN = 49;
             int DMX_SHUTTER_CHANNEL = 1;
+            lock (packet)
+            {
+                packet[startAddr + DMX_SHUTTER_CHANNEL - 1] = (byte)DMX_SHUTTER_OPEN;
+            }
 
-            packet[startAddr + DMX_SHUTTER_CHANNEL - 1] = (byte)DMX_SHUTTER_OPEN;
         }
         /// <summary>
         /// Closes device shutter
@@ -311,8 +347,11 @@ namespace DmxComm
         {
             int DMX_SHUTTER_CLOSE = 2;
             int DMX_SHUTTER_CHANNEL = 1;
+            lock (packet)
+            {
+                packet[startAddr + DMX_SHUTTER_CHANNEL - 1] = (byte)DMX_SHUTTER_CLOSE;
+            }
 
-            packet[startAddr + DMX_SHUTTER_CHANNEL - 1] = (byte)DMX_SHUTTER_CLOSE;
         }
 
         /// <summary>
@@ -325,38 +364,13 @@ namespace DmxComm
 
             if (level >= 0 && level <= 255)
             {
-                packet[startAddr + DMX_DIMMER_CHANNEL - 1] = (byte)level;
+                lock (packet)
+                {
+                    packet[startAddr + DMX_DIMMER_CHANNEL - 1] = (byte)level;
+                }
+
             }
         }
-
-        //only using standard gobos for now
-        const int GOBO_COUNT = 8;
-        const int GOBO_CHANNEL = 4;
-
-        /// <summary>
-        /// Set gobo, undocumented which values are what, but takes an int from 0-8
-        /// </summary>
-        /// <param name="goboVal">int 0-8</param>
-        public void setGoboStandard(int goboVal)
-        {
-            byte[] dmxGoboVals = new byte[] { 19, 29, 39, 49, 59, 69, 79, 85 };
-
-            if (goboVal <= GOBO_COUNT && goboVal > 0)
-            {
-                packet[startAddr + GOBO_CHANNEL - 1] = dmxGoboVals[goboVal - 1];
-            }
-        }
-
-        /// <summary>
-        /// Clears the gobo
-        /// </summary>
-        public void clearGobo()
-        {
-            packet[startAddr + GOBO_CHANNEL - 1] = 0;
-        }
-        const int MAX_FOCUS = 255;
-        const int MIN_FOCUS = 0;
-        const int FOCUS_CHANNEL = 6;
 
         /// <summary>
         /// Sets the gobo speed
@@ -374,6 +388,43 @@ namespace DmxComm
             //else not a valid direction
         }
 
+        //only using standard gobos for now
+        const int GOBO_COUNT = 8;
+        const int GOBO_CHANNEL = 4;
+
+        /// <summary>
+        /// Set gobo, undocumented which values are what, but takes an int from 0-8
+        /// </summary>
+        /// <param name="goboVal">int 0-8</param>
+        public void setGoboStandard(int goboVal)
+        {
+            byte[] dmxGoboVals = new byte[] { 19, 29, 39, 49, 59, 69, 79, 85 };
+
+            if (goboVal <= GOBO_COUNT && goboVal > 0)
+            {
+                lock (packet)
+                {
+                    packet[startAddr + GOBO_CHANNEL - 1] = dmxGoboVals[goboVal - 1];
+                }
+
+            }
+        }
+
+        /// <summary>
+        /// Clears the gobo
+        /// </summary>
+        public void clearGobo()
+        {
+            lock (packet)
+            {
+                packet[startAddr + GOBO_CHANNEL - 1] = 0;
+            }
+
+        }
+        const int MAX_FOCUS = 255;
+        const int MIN_FOCUS = 0;
+        const int FOCUS_CHANNEL = 6;
+
         //focus 0 = infinity, 255 = 2 meters
 
         /// <summary>
@@ -384,7 +435,11 @@ namespace DmxComm
         {
             if (focus >= MIN_FOCUS && focus <= MAX_FOCUS)
             {
-                packet[startAddr + FOCUS_CHANNEL - 1] = (byte)focus;
+                lock (packet)
+                {
+                    packet[startAddr + FOCUS_CHANNEL - 1] = (byte)focus;
+                }
+
             }
         }
 
@@ -394,7 +449,11 @@ namespace DmxComm
         /// </summary>
         public void setPrismOff()
         {
-            packet[startAddr + PRISM_CHANNEL - 1] = 0;
+            lock (packet)
+            {
+                packet[startAddr + PRISM_CHANNEL - 1] = 0;
+            }
+
         }
 
         //intensity range 0-59
@@ -407,14 +466,22 @@ namespace DmxComm
         /// <param name="intensity">int from 0-59, 59 being max rotate speed</param>
         public void setPrismRotate(rotation_direction_t direction, int intensity)
         {
-            //int temp;
+            int temp;
             if (direction == rotation_direction_t.CCW)
             {
-                packet[PRISM_CHANNEL + startAddr - 1] = (byte)(79 - intensity);
+                lock (packet)
+                {
+                    packet[PRISM_CHANNEL + startAddr - 1] = (byte)(intensity + 20);
+                }
+
             }
             else if (direction == rotation_direction_t.CW)
             {
-                packet[PRISM_CHANNEL + startAddr - 1] = (byte)(intensity + 90);
+                lock (packet)
+                {
+                    packet[PRISM_CHANNEL + startAddr - 1] = (byte)(intensity + 90);
+                }
+
             }
             //else not a valid direction
         }
@@ -435,7 +502,11 @@ namespace DmxComm
         {
             if (panVal >= MIN_PAN && panVal <= MAX_PAN)
             {
-                packet[PAN_CHANNEL + startAddr - 1] = (byte)(panVal + 128);
+                lock (packet)
+                {
+                    packet[PAN_CHANNEL + startAddr - 1] = (byte)(panVal + 128);
+                }
+
             }
         }
 
@@ -451,7 +522,11 @@ namespace DmxComm
         {
             if (tiltVal >= MIN_TILT && tiltVal <= MAX_TILT)
             {
-                packet[TILT_CHANNEL + startAddr - 1] = (byte)(tiltVal + 128);
+                lock (packet)
+                {
+                    packet[TILT_CHANNEL + startAddr - 1] = (byte)(tiltVal + 128);
+                }
+
             }
         }
 
@@ -468,9 +543,12 @@ namespace DmxComm
             ushort unsignedPan = (ushort)(panVal + (short.MinValue * -1));
             byte lsb = (byte)(unsignedPan & 255);
             byte msb = (byte)((unsignedPan & (255 << 8)) >> 8);
+            lock (packet)
+            {
+                packet[FINE_PAN_CHANNEL + startAddr - 1] = lsb;
+                packet[PAN_CHANNEL + startAddr - 1] = msb;
+            }
 
-            packet[FINE_PAN_CHANNEL + startAddr - 1] = lsb;
-            packet[PAN_CHANNEL + startAddr - 1] = msb;
 
         }
 
@@ -486,13 +564,81 @@ namespace DmxComm
             byte lsb = (byte)(unsignedTilt & 255);
             byte msb = (byte)((unsignedTilt & (255 << 8)) >> 8);
 
-            packet[FINE_TILT_CHANNEL + startAddr - 1] = lsb;
-            packet[TILT_CHANNEL + startAddr - 1] = msb;
+            lock (packet)
+            {
+                packet[FINE_TILT_CHANNEL + startAddr - 1] = lsb;
+                packet[TILT_CHANNEL + startAddr - 1] = msb;
+            }
+
         }
 
         static volatile bool effectThreadRunning = false;
         Thread effectThread = null;
 
+        public void threadedScanEffect(short min, short max, short speed)
+        {
+            effectThread = new Thread(() => scaneffectThread(packet, this, min, max, speed));
+            effectThread.Start();
+        }
+
+        public void threadedScanEffect()
+        {
+            //panItr starts -16000
+            //max = 0
+            //speed is 5
+            //defaults used for the studio performance
+
+            effectThread = new Thread(() => scaneffectThread(packet, this, -16000, 0, 5));
+            effectThread.Start();
+        }
+
+        public void endEffectThread(){
+            effectThreadRunning = false;
+        }
+        public bool isEffectThreadRunning()
+        {
+            return effectThreadRunning;
+        }
+
+        static bool itrIncrease = true;
+        
+        private static void scaneffectThread(byte[] packet, DmxDriver device, short min, short max, short speed)
+        {
+            effectThreadRunning = true;
+            device.setTilt(-80);
+
+            short panItr = min;
+            while (effectThreadRunning)
+            {
+                if (itrIncrease == true)
+                {
+                    if (panItr < max)
+                    {
+                        panItr += speed;
+                    }
+                    else
+                    {
+                        itrIncrease = false;
+                    }
+                }
+                else
+                {
+                    if (panItr > min)
+                    {
+                        panItr -= speed;
+                    }
+                    else
+                    {
+                        itrIncrease = true;
+                    }
+                }
+                device.setPan16Bit(panItr);
+                Thread.Sleep(1);
+
+            }
+
+            effectThreadRunning = false;
+        }
 
     }
 }
