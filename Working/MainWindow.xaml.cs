@@ -29,22 +29,28 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
     public partial class MainWindow : Window
     {
         
-        
-        /***************** User-created constants and variables *******************************************************************************************/
-        /**************************************************************************************************************************************************/
+        /* ********** USER-GENERATED CONSTANTS & VARIABLES ********** */
+        /**************************************************************/
 
-        // Dmx Object
+
+        /* dmx object */
         DmxDriver dmxdev = new DmxDriver(1);
         int tempc = 0;
 
+
+
+
+
+
         /* Mode selection variables */
-
-        // Mode designation
-        //DEPRECATED private Boolean isLiveMode = false;
-
 
         enum mode { StaticMode, CaptureMode, DynamicMode }
         private mode CurrentMode = mode.CaptureMode;
+
+
+
+
+
 
         /* Saving pose variables */
         
@@ -55,6 +61,9 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         // Data to send off the image of the skeleton pose to JSF
         public ImageSource mainPoseImage;
         
+
+
+
 
 
         /* Loading pose variables */
@@ -68,6 +77,8 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 
         // loadPose counter
         private int numPosesLoaded = 0;
+
+
 
         
 
@@ -114,13 +125,21 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         double focusValue;
 
 
+
+
+
+
         /* Static function variables */
 
         // poseArray index that identifies a match between the stream and a saved pose
         private int matchingPoseArrayIndex;
 
 
-        /***************************************************************************************************************************************************/
+        /* ******************** */
+
+
+
+
 
 
         /// <summary>
@@ -187,7 +206,6 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         /// Drawing image that we will display
         /// </summary>
         private DrawingImage imageSource;
-
 
         /// <summary>
         /// Initializes a new instance of the MainWindow class.
@@ -505,7 +523,6 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         }
         
 
-
         /// <summary>
         /// Draws a skeleton's bones and joints
         /// </summary>
@@ -635,13 +652,14 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 
 
 
-        /*************************************************** User created functions **********************************************************************************/
-        /*************************************************************************************************************************************************************/
 
 
 
+        /* ********** USER-GENERATED FUNCTIONS ********** */
+        /* ********************************************** */
 
 
+        
 
         /* *****MODE SELECTION FUNCTIONS***** */
 
@@ -649,6 +667,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         /// <summary>
         /// Radio button function to select capture mode
         /// </summary>
+        /// <param name="sender, e"></param>
         /// <returns> N/A </returns>
         private void captureMode_Checked(object sender, RoutedEventArgs e)
         {
@@ -662,6 +681,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         /// <summary>
         /// Radio button function to select static performance mode
         /// </summary>
+        /// <param name="sender, e"></param>
         /// <returns> N/A </returns>
         private void staticMode_Checked(object sender, RoutedEventArgs e)
         {
@@ -687,6 +707,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         /// <summary>
         /// Radio button function to select dynamic performance mode
         /// </summary>
+        /// <param name="sender, e"></param>
         /// <returns> N/A </returns>
         private void dynamicMode_Checked(object sender, RoutedEventArgs e)
         {
@@ -699,142 +720,11 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 
 
 
-        /* ***** WRITE POSE FUNCTIONS***** */
-
-
-        // to be removed later
-        ///// <summary>
-        ///// Event when a button is clicked to capture a pose. This will be used to capture poses before a performance.
-        ///// </summary>
-        ///// <param name="sender"></param>
-        ///// <param name="e"></param>
-        ///// <returns>N/A</returns>
-        //private void CapturePose(object sender, RoutedEventArgs e)
-        //{
-        //    // Sign up for the SkeletonFrameReady event when the button is clicked
-        //    if (this.sensor != null)
-        //    {
-        //        // Add the current stream skeleton
-        //        this.sensor.SkeletonFrameReady += this.CaptureCurrentSkeleton;
-        //    }
-        //    else
-        //        txtCapturedInfo.Text = "No skeleton present";
-        //}
-
-        ///// <summary>
-        ///// Structural flow for 'capturing' a desired pose; Once the Capture button is clicked,
-        ///// gets the global currentStreamPose; if the pose is acceptable by the user, it's
-        ///// written to a .txt file to be loaded for a dance session
-        ///// </summary>
-        ///// <param name="sender"></param>
-        ///// <param name="s"></param>
-        ///// <returns>N/A</returns>
-        //private void CaptureCurrentSkeleton(object sender, SkeletonFrameReadyEventArgs s)
-        //{
-        //    ///* Create a new Skeleton array to fill with the 6 poses that the data stream is constantly 
-        //    // * capturing because there can be up to six people in frame when using the Kinect */
-        //    //Skeleton[] skeletons = new Skeleton[0];
-
-        //    //// Making sure that the skeletonFrame & stream are working correctly
-        //    //using (SkeletonFrame skeletonFrame = s.OpenSkeletonFrame())
-        //    //{
-        //    //    if (skeletonFrame != null)
-        //    //    {
-        //    //        skeletons = new Skeleton[skeletonFrame.SkeletonArrayLength];
-        //    //        skeletonFrame.CopySkeletonDataTo(skeletons);
-        //    //    }
-        //    //}
-
-        //    //// Declaring the variable to get the correct skeleton index that has an actual person/non-null data
-        //    //int INDEX_WITH_THE_DATA = 0;
-
-        //    //// Look through the 6 skeleton indexes for the correct one
-        //    //for (int i = 0; i < skeletons.Length; i++)
-        //    //{
-        //    //    // If the skeleton at index i doesn't have empty data (using the right Hand position as an example)... 
-        //    //    if (skeletons[i].Joints[JointType.HandRight].Position.X != 0)
-        //    //    {
-        //    //        // Recognize this as the [1/6] correct skeleton index
-        //    //        INDEX_WITH_THE_DATA = i;
-        //    //    }
-        //    //                                               // txtCapturedInfo.Text = skeletons[0].Joints[JointType.Head].Position.X.ToString();
-        //    //}
-
-        //    //// Create a new Skeleton that is linked to the correct skeleton index
-        //    //Skeleton trackedSkeleton = skeletons[INDEX_WITH_THE_DATA];
 
 
 
+        /* *****WRITE POSE FUNCTIONS***** */
 
-
-
-
-
-        //    // Creates a new skeleton as the current global stream skeleton
-        //    skeletonPose capturedPose = currentStreamPose;
-
-
-        //    /* conditional... put something in here about if and only if the user wants to save this pose */
-
-
-        //    // When the capture is a success, print out a message
-        //    txtCapturedInfo.Text = "Pose added. " + numPosesCaptured + " poses";
-        //    //txtCapturedInfo.Text = "Right elbow angle captured at: " + AngleBetweenJoints(skeletons[INDEX_WITH_THE_DATA].Joints[JointType.ShoulderRight],
-        //    //skeletons[INDEX_WITH_THE_DATA].Joints[JointType.ElbowRight],skeletons[INDEX_WITH_THE_DATA].Joints[JointType.HandRight]);
-
-
-        //    // Write the pose joint angles to a unique text file in .\\poses
-        //    writePoseToFile(capturedPose);
-
-        //    // sign-out of the event
-        //    this.sensor.SkeletonFrameReady -= this.CaptureCurrentSkeleton;
-        //}
-        ///// <summary>
-        ///// Puts the skeleton joint angles in an array to be saved to a text file
-        ///// </summary>
-        ///// <param name="p"></param>
-        ///// <returns>N/A</returns>
-        //private void writePoseToFile(skeletonPose p)
-        //{
-        //    skeletonPose capturedPose = currentStreamPose;
-
-        //    // Open file dialog to pick a save location
-        //    SaveFileDialog saveFileDiag = new SaveFileDialog();
-
-        //    if (saveFileDiag.ShowDialog() == System.Windows.Forms.DialogResult.OK)
-        //    {
-        //        String filePath = saveFileDiag.FileName;
-        //        StreamWriter streamWriter = new StreamWriter(filePath);
-        //        streamWriter.Write("TEST GUCCI NIGGA");
-
-        //    }
-
-        //    // Save fileName path as a string
-
-
-        //    // Create a stream writer to write to a new file
-
-
-
-        //    // Increase the poses captured counter
-        //    //numPosesCaptured++;
-
-        //    // String that will hold the concatenated angles as a string in display in a pop-up
-        //    //String promptAngles = "";
-
-        //    // Converting the angles to strings for writting to the external txt file
-        //    //for (int i = 0; i < p.Joints.Length; i++)
-        //    //{
-        //    // streamWriter.writeLine(p.Names[i] + " " + Convert.ToString(p.Joints[i]) + " 15");   // when we have a tolerance, we wouldn't have 15 here as a default string
-
-
-
-
-        //    //strAngles[i] = Convert.ToString(p.Joints[i]) + "\n";  //turn an index back into a name
-        //    //promptAngles += i + ": " + Convert.ToString(p.Joints[i]) + "\n";
-        //    //}
-
-        //}
 
         /// <summary>
         /// Function that opens up the joints to check window
@@ -866,7 +756,11 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             
         }
 
-
+        /// <summary>
+        /// Function that opens up the joints to check window
+        /// </summary>
+        /// <param name="controlToRender"></param>
+        /// <returns> N/A </returns>
         private System.Drawing.Image ConvertElement(FrameworkElement controlToRender)
         {
             RenderTargetBitmap rtb = new RenderTargetBitmap(
@@ -914,6 +808,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         /// <summary>
         /// Once joints to check have been selected, write the pose to text
         /// </summary>
+        /// <param name="caputedPose, jointTolerances, lightingEffectName"></param>
         /// <returns> N/A </returns>
         private void savePose(skeletonPose capturedPose, double[] jointTolerances, String lightingEffectName)
         {
@@ -959,6 +854,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         /// <summary>
         /// Function to load poses from the openBox path once the user has specified a path
         /// </summary>
+        /// <param name="sender, e"></param>
         /// <returns> N/A </returns>
         private void LoadPose(object sender, RoutedEventArgs e)
         {
@@ -1259,7 +1155,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         /// <summary>
         /// Static lighting functions overseer & structural handler
         /// </summary>
-        /// <param name="macthingPoseArrayIndex"></param>
+        /// <param name="machedPose"></param>
         /// <returns>N/A</returns>
         private void staticLightingHandler(skeletonPose matchedPose)
         {
@@ -1296,80 +1192,62 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         }
 
         /// <summary>
-        /// Ideal matched pose: 
+        /// Ideal matched pose: Uses a thread to pan a pink light
         /// </summary>
-        /// <param name="capturedPose"></param>
-        /// <param name="currentSkel"></param>
         /// <returns> N/A </returns>
         private void rightArmStatic()
         {
             txtDynamic.Text = ("Static:  right arm static");
+
+            resetLight();
+
+            // Run thread effect
             if (!dmxdev.isEffectThreadRunning())
             {
                 dmxdev.threadedScanEffect();
             }
             
+            //rightArmStatic effects
             dmxdev.setColorContinuous(DmxDriver.color_t.PINK);
             dmxdev.setGoboStandard(5);
             dmxdev.setPrismRotate(DmxDriver.rotation_direction_t.CW, 10);
             dmxdev.setShutterOpen();
-            /*
-            tempc += 1;
-            dmxdev.setLampOn();
-            dmxdev.setDimmerLevel((byte)(tempc & 0xff));
-            dmxdev.setPan((byte)((tempc % 255) - 128));
-            dmxdev.setTilt(110);
-            dmxdev.setColorContinuous(DmxDriver.color_t.PINK);
-             */
-         
         }
 
         /// <summary>
-        /// Ideal matched pose: 
+        /// Ideal matched pose: Uses a thread to pan a blue light
         /// </summary>
-        /// <param name="capturedPose"></param>
-        /// <param name="currentSkel"></param>
         /// <returns> N/A </returns>
         private void leftArmStatic()
         {
             txtDynamic.Text = ("Static:  left arm static");
+
+            resetLight();
+
+            // Run thread effect
             if (!dmxdev.isEffectThreadRunning())
             {
                 dmxdev.threadedScanEffect();
             }
+
+            //leftArmStatic effects
             dmxdev.setColorContinuous(DmxDriver.color_t.BLUE_101);
             dmxdev.setGoboStandard(5);
             dmxdev.setPrismRotate(DmxDriver.rotation_direction_t.CW, 10);
             dmxdev.setShutterOpen();
-            /*
-            tempc -= 1;
-            dmxdev.setLampOn();
-            dmxdev.setDimmerLevel((byte)(tempc & 0xff));
-            dmxdev.setPan((byte)((tempc % 255) - 128));
-            dmxdev.setTilt(110);
-            dmxdev.setColorContinuous(DmxDriver.color_t.BLUE_101);
-             */
-            
         }
 
         /// <summary>
-        /// Ideal matched pose: 
+        /// Ideal matched pose: Sets green strobe on in frame main user
         /// </summary>
-        /// <param name="capturedPose"></param>
-        /// <param name="currentSkel"></param>
         /// <returns> N/A </returns>
         private void lungeKneeStatic()
         {
-            dmxdev.endEffectThread();
             txtDynamic.Text = ("Static:  lunge knee static");
 
-            dmxdev.clearGobo();
-            dmxdev.setPrismOff();
-            dmxdev.setLampOn();
-            dmxdev.setDimmerLevel(200);
-            dmxdev.setFocus((int)focusValue);
-            txtSlider.Text = Convert.ToString(focusValue);
-            // possibly add threading for slow pannig
+            resetLight();
+
+            //lungeKneeStatic effects
             dmxdev.setColorContinuous(DmxDriver.color_t.GREEN_202);
             dmxdev.shutterStrobe();
             dmxdev.setPan(-13);
@@ -1379,24 +1257,16 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         }
 
         /// <summary>
-        /// Ideal matched pose: 
+        /// Ideal matched pose: Sets light up with gobo effect
         /// </summary>
-        /// <param name="capturedPose"></param>
-        /// <param name="currentSkel"></param>
         /// <returns> N/A </returns>
         private void vStatic()
         {
-            dmxdev.endEffectThread();
             txtDynamic.Text = ("Static:  v static");
 
-            dmxdev.setShutterOpen();
-            dmxdev.clearGobo();
-            dmxdev.setPrismOff();
-            dmxdev.setLampOn();
-            dmxdev.setDimmerLevel(255);
-            dmxdev.setFocus((int)focusValue);
-            txtSlider.Text = Convert.ToString(focusValue);
+            resetLight();
 
+            //vStatic effects
             dmxdev.setTilt(-70);
             dmxdev.setPan(-20);
             dmxdev.setColorContinuous(DmxDriver.color_t.RED);
@@ -1406,48 +1276,55 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         }
 
         /// <summary>
-        /// Ideal matched pose: 
+        /// Ideal matched pose: Sets light on in frame main user
         /// </summary>
-        /// <param name="capturedPose"></param>
-        /// <param name="currentSkel"></param>
         /// <returns> N/A </returns>
         private void defaultPose()
         {
-            dmxdev.endEffectThread();
             txtDynamic.Text = ("Static:  default");
 
-            dmxdev.setShutterOpen();
-            dmxdev.clearGobo();
-            dmxdev.setPrismOff();
-            dmxdev.setLampOn();
-            dmxdev.setDimmerLevel(100);
-            dmxdev.setFocus((int)focusValue);
-            txtSlider.Text = Convert.ToString(focusValue);
+            resetLight();
 
+            //default effects
             dmxdev.setColorContinuous(DmxDriver.color_t.WHITE);
             dmxdev.setPan(-12);
             dmxdev.setTilt(-80);
 
         }
-
+        
+        /// <summary>
+        /// Ideal matched pose: Sets light on second, out of frame user 
+        /// </summary>
+        /// <returns> N/A </returns>
         private void defaultSecondPerson()
         {
-            dmxdev.endEffectThread();
-            txtDynamic.Text = ("Static:  default second person");
+            txtDynamic.Text = ("Static: default second person");
+            
+            resetLight();
 
-            dmxdev.setShutterOpen();
-            dmxdev.clearGobo();
-            dmxdev.setPrismOff();
-            dmxdev.setLampOn();
-            dmxdev.setDimmerLevel(100);
-            dmxdev.setFocus((int)focusValue);
-            txtSlider.Text = Convert.ToString(focusValue);
-
+            //default effects
             dmxdev.setColorContinuous(DmxDriver.color_t.WHITE);
             dmxdev.setPan(-20);
             dmxdev.setTilt(-82);
 
         }
+
+        /// <summary>
+        /// Reset functions for each time a new static effect is called 
+        /// </summary>
+        /// <returns> N/A </returns>
+        private void resetLight()
+        {
+            dmxdev.endEffectThread();
+            dmxdev.clearGobo();
+            dmxdev.setPrismOff();
+            dmxdev.setLampOn();
+            dmxdev.setDimmerLevel(200);
+            dmxdev.setShutterOpen();
+            txtSlider.Text = Convert.ToString(focusValue);
+            dmxdev.setFocus((int)focusValue);
+        }
+
 
 
 
@@ -1682,6 +1559,11 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
       
         }
 
+
+
+
+
+
         /* *****TEST FUNCTIONS***** */
 
 
@@ -1697,6 +1579,20 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             skeletonPose currentPose = getPose(currentSkel);
 
             return isCurrentPose;
+        }
+
+        /// <summary>
+        /// Checks to see if the current *held* pose is a match by slowly rotating the device
+        /// </summary>
+        /// <returns>N/A</returns>
+        private void isStaticPose()
+        {
+            tempc += 1;
+            dmxdev.setLampOn();
+            dmxdev.setDimmerLevel((byte)(tempc & 0xff));
+            dmxdev.setPan((byte)((tempc % 255) - 128));
+            dmxdev.setTilt(110);
+            dmxdev.setColorContinuous(DmxDriver.color_t.PINK);   
         }
 
 
