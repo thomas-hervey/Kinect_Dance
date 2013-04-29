@@ -43,7 +43,6 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 
 
         /* Mode selection variables */
-
         enum mode { StaticMode, CaptureMode, DynamicMode }
         private mode CurrentMode = mode.CaptureMode;
 
@@ -54,11 +53,10 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 
         /* Saving pose variables */
         
-        // writePose counter
         private int numPosesWritten = 0;
-        // array to hold the names of lighting effects (populates combobox in JSF)
+        // array holding the names of lighting effects (populates combobox in JSF)
         public String[] effectNamesArray = new String[8];
-        // Data to send off the image of the skeleton pose to JSF
+        // image of the skeleton pose (populates mainPoseImage in JSF)
         public ImageSource mainPoseImage;
         
 
@@ -74,7 +72,6 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         private int NAME_INDEX = 0;
         private int ANGLE_INDEX = 1;
         private int TOLERANCE_INDEX = 2;
-
         // loadPose counter
         private int numPosesLoaded = 0;
 
@@ -85,7 +82,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 
         /* Stream variables */
 
-        // SkeletonPose variable that is constantly updated directly from the skeleton stream
+        // skeletonPose variable that is constantly updated directly from the skeleton stream
         private skeletonPose currentStreamPose;
         /// <summary>                                                                                                                                                
         /// Struct declaration that will house all of the joint angles and time stamp of a skeleton 
@@ -118,9 +115,11 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
 
             // The desired lighting function for this pose       
             public String lightingEffectName;
-
         }
-
+        // Dynamic mode sub-modes
+        enum dynmodes { FOLLOW, HAND_PAN_TILT, GOBO_SPIN };
+        // Start-up dynamic mode sub-mode: hand pan tilt
+        private dynmodes currentDyanmicMode = dynmodes.HAND_PAN_TILT;
         // Focus value taken from the GUI slider
         double focusValue;
 
@@ -134,7 +133,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         // poseArray index that identifies a match between the stream and a saved pose
         private int matchingPoseArrayIndex;
 
-
+        /* ******************** */
         /* ******************** */
 
 
@@ -338,15 +337,11 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
             }
             
             // User added program shutdown
-            
             dmxdev.stop();
             dmxdev = null;
             System.Windows.Application.Current.Shutdown();
 
         }
-
-        enum dynmodes {FOLLOW, HAND_PAN_TILT, GOBO_SPIN};
-        private dynmodes currentDyanmicMode = dynmodes.HAND_PAN_TILT;
 
         /// <summary>
         /// Event handler for Kinect sensor's SkeletonFrameReady event
@@ -382,36 +377,20 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                             this.DrawBonesAndJoints(skel, dc);
 
 
-                            /***************** User-created extensions original code input ****************************************************************/
-                            /******************************************************************************************************************************/
-
-                            /* Seeing as how this function is looped foreach skeleton in the stream, here is where we have decided to 'get a pose' and save
-                             * it to a global. This global will be constantly updated with new information from the stream */
-
-
-                            //// Getting the correct number of poses captured
-                            //int numPosesCaptured_LOCAL = numPosesCaptured;
-                            //if (numPosesCaptured_LOCAL > 0)
-                            //{
-                            //    numPosesCaptured_LOCAL = numPosesCaptured_LOCAL - 1;
-                            //}
-
-
-                            // Create a new TimeSpan variable which will hold the amount of time elapsed since the Pose CAPTURED_POSE was captured
-                            // **********  TimeSpan capturedTimeElapsed = DateTime.Now - poseArray[numPosesCaptured_LOCAL].timeElapsed;
-
+                            /***************** User-created extensions original code input *****************/
+                            /*******************************************************************************/
 
 
                             // Constantly assigning the currentStreamPose variable to the current stream data (entailing joint angles and joint names)
                             currentStreamPose = getPose(skel);
 
-                            // If the user is in capture mode Don't allow pose checking or lighting effects
+                            // If the user is in capture mode: Allow capturing & loading but not pose checking or lighting effects
                             if (CurrentMode == mode.CaptureMode)
                             {
                                 txtCapturedInfo.Text = "In capture mode";
                             }
 
-                            // If the user is in live mode: Allow pose checking & lighting effects
+                            // If the user is in static mode: Allow pose checking & lighting effects but not capturing & loading
                             else if (CurrentMode == mode.StaticMode)
                             {
                                 txtCapturedInfo.Text = "In static mode";
@@ -421,30 +400,24 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                                 // If one of the poses matches, activate its according dance performance function
                                 if (matchingPoseArrayIndex != -99)
                                 {
-                                    //Lets the user know which pose the program thinks is a match
+                                    // Lets the user know which pose the program sees as a match
                                     txtCapturedInfo.Text = "Matching Pose seen: " + ((skeletonPose)poseArrayList[matchingPoseArrayIndex]).lightingEffectName;
 
-                                    // Passes the pose to the lighting handler
+                                    // Passes the pose to the static lighting handler
                                     staticLightingHandler((skeletonPose)poseArrayList[matchingPoseArrayIndex]);
                                 }
                             }
+
+                            // If the user is in dynamic mode: Don't allow capturing, loading or pose checking
                             else if (CurrentMode == mode.DynamicMode)
                             {
+                                // Passes the untouched stream skel skeleton to the dynamic light handler
                                 dynamicModeHandler(skel);
-
                             }
-
-
-                            //// NON-FILE LIGHTING EFFECT TEST FUNCTION
-                            //if (currentStreamPose.Joints[1] > 70 && currentStreamPose.Joints[1] < 110)
-                            //{
-                            //    txtCapturedInfo.Text = "YAY POSE";
-                            //    doTestFunction();
-                            //}
-
                         }
+                        /*****************/
+                        /*****************/
 
-                        /************************************************************************************************************************************/
 
                         else if (skel.TrackingState == SkeletonTrackingState.PositionOnly)
                         {
@@ -457,6 +430,8 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                         }
                     }
                 }
+
+                // User added function for the light to pan when no one is in a frame
                 else
                 {
 
@@ -473,55 +448,11 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                     }
                 }
 
+
                 // prevent drawing outside of our render areaoa
                 this.drawingGroup.ClipGeometry = new RectangleGeometry(new Rect(0.0, 0.0, RenderWidth, RenderHeight));
             }
         }
-
-
-        Stopwatch colorIterateTimer = new Stopwatch();
-        private void dynamicFollowSkeleton(Skeleton skel)
-        {
-            //X position of the skeleton is a -1.0 to 1.0 value with 0 being the center of the kinect screen
-            // so at -1.0, we want setPan = calPanLeft, at 1.0, setPan= calPanRight, at 0 setPan = (left + right)/2.0f
-            
-            dmxdev.setTilt(-85);
-            dmxdev.setShutterOpen();
-            dmxdev.setLampOn();
-            dmxdev.setDimmerLevel(255);
-            dmxdev.setColorContinuous(DmxDriver.color_t.WHITE);
-            float hipX = skel.Joints[JointType.HipCenter].Position.X;
-
-            dmxdev.setPan16Bit((short)(centerPan + (range * hipX)));
-
-            float rHandY = skel.Joints[JointType.HandRight].Position.Y;
-
-            if (rHandY > 0.5)
-            {
-                if (colorIterateTimer.IsRunning == false)
-                {
-                    colorIterateTimer.Start();
-                }
-                else if (colorIterateTimer.ElapsedMilliseconds > 1000)
-                {
-                    dmxdev.setNextColor();
-                    colorIterateTimer.Stop();
-                    colorIterateTimer.Reset();
-                }                
-                if (colorIterateTimer.IsRunning == false)
-                {
-                    colorIterateTimer.Start();
-                }
-                else if (colorIterateTimer.ElapsedMilliseconds > 1000)
-                {
-                    dmxdev.setPrevColor();
-                    colorIterateTimer.Stop();
-                    colorIterateTimer.Reset();
-                }                
-            }
-
-        }
-        
 
         /// <summary>
         /// Draws a skeleton's bones and joints
@@ -1352,54 +1283,16 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                     txtDynamic.Text = "Dynamic:  Follow";
                     dynamicFollowSkeleton(skel);
                     break;
-                /*case dynmodes.GOBO_SPIN:
-                    txtDynamic.Text = "Dynamic:  Gobo Spin";
-                    dynamicGoboSpin(skel);
-                    break;*/
+
                 case dynmodes.HAND_PAN_TILT:
-                    
                     txtDynamic.Text = "Dynamic:  Hand Pan Tilt";
-                    
-                    dmxdev.clearGobo();
-                    dmxdev.setShutterOpen();
-                    dmxdev.setLampOn();
-                    dmxdev.setColorContinuous(DmxDriver.color_t.BLUE_101);
-
-                    float dimmerLevel = skel.Joints[JointType.HandLeft].Position.Y * 255;
-                    dmxdev.setDimmerLevel((int)dimmerLevel);
-                    float panPos;
-                    float tiltPos;
-
-                    //Attempt at smoothing our data points, average position over 5 frames before calculating a new position
-                    //if (xList.Count < 5)
-                    //{
-                    //    xList.Add(skel.Joints[JointType.HandRight].Position.X * 127);
-                    //    yList.Add(skel.Joints[JointType.HandRight].Position.Y * 127);
-                    //    return;
-                    //}
-                    //else
-                    //{
-                    //    panPos = getAverage(xList);
-                    //    tiltPos = getAverage(yList);
-                    //    xList.Clear();
-                    //    yList.Clear();
-                    //}
-
-
-
-                    panPos = skel.Joints[JointType.HandRight].Position.X * short.MaxValue;
-                    tiltPos = skel.Joints[JointType.HandRight].Position.Y * short.MaxValue;
-                    //double jointDistance = getDistanceJoints(skel.Joints[JointType.HandLeft], skel.Joints[JointType.HandRight]);
-                    //txtCapturedInfo.Text = "Left Hand X:" + (int)(skel.Joints[JointType.HandLeft].Position.X * 127);
-
-                    //dmxdev.setPan((int)panPos);
-                    //dmxdev.setTilt((int)tiltPos);
-
-                    dmxdev.setPan16Bit((short)panPos);
-                    dmxdev.setTilt16Bit((short)tiltPos);
-
+                    dynamicHandPanTilt(skel);
                     break;
 
+                case dynmodes.GOBO_SPIN:
+                    txtDynamic.Text = "Dynamic:  Gobo Spin";
+                    dynamicGoboSpin(skel);
+                    break;
             }
         }
 
@@ -1410,7 +1303,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         /// <returns> N/A </returns>
         private void checkForModeSwitch(Skeleton skel)
         {
-
+            // If the user holds their right hand up to their head, FF to the next sub-mode
             if (getDistanceJoints(skel.Joints[JointType.HandRight], skel.Joints[JointType.Head]) < 20)
             {
                 if (stopwatch.IsRunning && stopwatch.ElapsedMilliseconds >= 2000)
@@ -1426,6 +1319,7 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                 }
 
             }
+            // If the user holds their left hand up to their head, RW to the previous sub-mode
             else if (getDistanceJoints(skel.Joints[JointType.HandLeft], skel.Joints[JointType.Head]) < 20)
             {
                 if (stopwatch.IsRunning && stopwatch.ElapsedMilliseconds >= 2000)
@@ -1440,23 +1334,25 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
                     stopwatch.Start();
                 }
             }
+            // Otherwise, reset the stopwatch
             else if (stopwatch.IsRunning)
             {
                 //detected
                 stopwatch.Stop();
                 stopwatch.Reset();
             }
-
         }
+
+        // Dynamic mode sub-mode components
+        ArrayList xList = new ArrayList();
+        ArrayList yList = new ArrayList();
+        Stopwatch stopwatch = new Stopwatch();
 
         /// <summary>
         /// Dynamic sub-mode switcher acting like a FF button 
         /// </summary>
         /// <param name="skel"></param>
         /// <returns> N/A </returns>
-        ArrayList xList = new ArrayList();
-        ArrayList yList = new ArrayList();
-        Stopwatch stopwatch = new Stopwatch();
         private void setNextDynamicMode(Skeleton skel)
         {
             var modes = (dynmodes[])Enum.GetValues(typeof(dynmodes));
@@ -1527,9 +1423,100 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         /// </summary>
         /// <param name="skel"></param>
         /// <returns> N/A </returns>
-        short centerPan = 0;
-        short range = 2600;
+        private void dynamicFollowSkeleton(Skeleton skel)
+        {
+            //X position of the skeleton is a -1.0 to 1.0 value with 0 being the center of the kinect screen
+            // so at -1.0, we want setPan = calPanLeft, at 1.0, setPan= calPanRight, at 0 setPan = (left + right)/2.0f
+           
+            short centerPan = 0;
+            short range = 2600;
+            Stopwatch colorIterateTimer = new Stopwatch();
 
+            // Resets
+            dmxdev.setTilt(-85);
+            dmxdev.setShutterOpen();
+            dmxdev.setLampOn();
+            dmxdev.setDimmerLevel(255);
+            dmxdev.setColorContinuous(DmxDriver.color_t.WHITE);
+
+            // Follow user
+            float hipX = skel.Joints[JointType.HipCenter].Position.X;
+            dmxdev.setPan16Bit((short)(centerPan + (range * hipX)));
+            float rHandY = skel.Joints[JointType.HandRight].Position.Y;
+
+            // Color selection ability
+            if (rHandY > 0.5)
+            {
+                if (colorIterateTimer.IsRunning == false)
+                {
+                    colorIterateTimer.Start();
+                }
+                else if (colorIterateTimer.ElapsedMilliseconds > 1000)
+                {
+                    dmxdev.setNextColor();
+                    colorIterateTimer.Stop();
+                    colorIterateTimer.Reset();
+                }
+                if (colorIterateTimer.IsRunning == false)
+                {
+                    colorIterateTimer.Start();
+                }
+                else if (colorIterateTimer.ElapsedMilliseconds > 1000)
+                {
+                    dmxdev.setPrevColor();
+                    colorIterateTimer.Stop();
+                    colorIterateTimer.Reset();
+                }
+            }
+
+        }
+        
+        /// <summary>
+        /// Dynamic sub-mode: User controls the light's direction & brightness 
+        /// </summary>
+        /// <param name="skel"></param>
+        /// <returns> N/A </returns>
+        private void dynamicHandPanTilt(Skeleton skel)
+        {
+
+            // Resets
+            dmxdev.clearGobo();
+            dmxdev.setShutterOpen();
+            dmxdev.setLampOn();
+            dmxdev.setColorContinuous(DmxDriver.color_t.BLUE_101);
+
+            float dimmerLevel = skel.Joints[JointType.HandLeft].Position.Y * 255;
+            dmxdev.setDimmerLevel((int)dimmerLevel);
+            float panPos;
+            float tiltPos;
+
+            //Attempt at smoothing our data points, average position over 5 frames before calculating a new position
+            //if (xList.Count < 5)
+            //{
+            //    xList.Add(skel.Joints[JointType.HandRight].Position.X * 127);
+            //    yList.Add(skel.Joints[JointType.HandRight].Position.Y * 127);
+            //    return;
+            //}
+            //else
+            //{
+            //    panPos = getAverage(xList);
+            //    tiltPos = getAverage(yList);
+            //    xList.Clear();
+            //    yList.Clear();
+            //}
+
+            panPos = skel.Joints[JointType.HandRight].Position.X * short.MaxValue;
+            tiltPos = skel.Joints[JointType.HandRight].Position.Y * short.MaxValue;
+            //double jointDistance = getDistanceJoints(skel.Joints[JointType.HandLeft], skel.Joints[JointType.HandRight]);
+            //txtCapturedInfo.Text = "Left Hand X:" + (int)(skel.Joints[JointType.HandLeft].Position.X * 127);
+
+            //dmxdev.setPan((int)panPos);
+            //dmxdev.setTilt((int)tiltPos);
+
+            dmxdev.setPan16Bit((short)panPos);
+            dmxdev.setTilt16Bit((short)tiltPos);
+        }
+        
         /// <summary>
         /// Dynamic sub-mode: User spins gobo 
         /// </summary>
@@ -1537,11 +1524,14 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
         /// <returns> N/A </returns>
         private void dynamicGoboSpin(Skeleton skel)
         {
+            
+            // Resets
             dmxdev.clearGobo();
             dmxdev.setShutterOpen();
             dmxdev.setLampOn();
             dmxdev.setGoboStandard(2);
             dmxdev.setColorContinuous(DmxDriver.color_t.GREEN_202);
+
             float rightHandX = skel.Joints[JointType.HandRight].Position.X * 127;
             float rightHandY = skel.Joints[JointType.HandRight].Position.Y * 127;
             dmxdev.setPan((int)rightHandX);
@@ -1684,5 +1674,8 @@ namespace Microsoft.Samples.Kinect.SkeletonBasics
            txtSlider.Text = Convert.ToString(focusValue);
         }
 
+
+        /* ******************** */
+        /* ******************** */
     }
 }
